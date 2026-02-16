@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html class="dark" lang="th">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>ราคาน้ำมันวันนี้ - จัดการเวลาเที่ยว-ค่าใช้จ่าย</title>
+    <meta name="description" content="ตรวจสอบราคาน้ำมันล่าสุดจากสถานีบริการทั่วประเทศไทย - อัปเดตแบบเรียลไทม์"/>
+    <meta name="keywords" content="ราคาน้ำมัน, น้ำมัน, ปตท, บางจาก, เชลล์, ประเทศไทย"/>
+    <meta name="author" content="ราคาน้ำมัน - จัดการเวลาเที่ยว-ค่าใช้จ่าย"/>
+    <meta name="robots" content="index, follow"/>
+    
+    <meta property="og:title" content="ราคาน้ำมันวันนี้ - จัดการเวลาเที่ยว-ค่าใช้จ่าย"/>
+    <meta property="og:description" content="ตรวจสอบราคาน้ำมันล่าสุดจากสถานีบริการทั่วประเทศไทย"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:url" content="https://paiteaw-web.web.app/oil.html"/>
+    <meta property="og:image" content="https://paiteaw-web.web.app/og-image.png"/>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link rel="preconnect" href="https://cdn.tailwindcss.com"/>
+    <link rel="preconnect" href="https://www.gstatic.com"/>
+    
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#6366f1",
+                        "background-light": "#f8fafc",
+                        "background-dark": "#020617",
+                    },
+                    fontFamily: {
+                        sans: ["Kanit", "Inter", "sans-serif"],
+                        display: ["Outfit", "Kanit", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "1.25rem",
+                    },
+                },
+            },
+        };
+    </script>
+    <style type="text/tailwindcss">
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* =========== Theme Transition (Smooth Light/Dark) =========== */
+        html {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        .theme-transition {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* =========== Neon Glow =========== */
+        .neon-glow {
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+        }
+        
+        .dark .neon-glow {
+            box-shadow: 0 0 25px rgba(99, 102, 241, 0.6);
+        }
+  
+        /* =========== Page Transition =========== */
+        .page-transition {
+            animation: pageTransition 0.4s ease-out;
+        }
+        
+        @keyframes pageTransition {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* =========== Hover Lift =========== */
+        .hover-lift {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
+        }
+        
+        /* =========== Dropdown Menu =========== */
+        .dropdown-menu {
+            transform-origin: top right;
+            animation: dropdownIn 0.2s ease-out;
+        }
+        
+        @keyframes dropdownIn {
+            0% { opacity: 0; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        
+        /* =========== Skeleton Loading =========== */
+        .skeleton {
+            background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+            background-size: 200% 100%;
+            animation: skeleton 1.5s infinite;
+        }
+        
+        .dark .skeleton {
+            background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+            background-size: 200% 100%;
+        }
+        
+        @keyframes skeleton {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        /* =========== Custom Scrollbar =========== */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+        
+        /* =========== Slide In Animation =========== */
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            0% { transform: translateX(100%); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+        
+        /* =========== Modal Animation (Fade + Scale) =========== */
+        .modal-overlay {
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .modal-content {
+            animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        
+        @keyframes scaleIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        /* =========== Modal Hidden =========== */
+        .modal-hidden {
+            animation: fadeOut 0.3s ease-out forwards;
+        }
+        
+        .modal-content.modal-hidden {
+            animation: scaleOut 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        
+        @keyframes scaleOut {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+        }
+        
+        /* =========== Ripple Effect Button =========== */
+        .ripple-button {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ripple-button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+        
+        .ripple-button:active::after {
+            animation: ripple 0.6s ease-out;
+        }
+        
+        @keyframes ripple {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 1;
+            }
+            100% {
+                width: 300px;
+                height: 300px;
+                opacity: 0;
+            }
+        }
+        
+        /* =========== Hover Scale CTA Buttons =========== */
+        .btn-scale {
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .btn-scale:hover {
+            transform: scale(1.05);
+        }
+        
+        .btn-scale:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300">
+    
+    <!-- Page Loader -->
+    <div id="pageLoader" class="fixed inset-0 z-[100] bg-background-light dark:bg-background-dark flex items-center justify-center transition-opacity duration-300">
+        <div class="flex flex-col items-center gap-3">
+            <div class="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">กำลังโหลด...</p>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="fixed top-0 w-full z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 theme-transition">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <a href="dashboard.html" class="p-2.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+                    <span class="material-symbols-outlined text-slate-600 dark:text-slate-300">arrow_back</span>
+                </a>
+                <div>
+                    <img src="https://i.postimg.cc/d3Jnyv2F/11zon-cropped.png" alt="Logo" class="w-10 h-10 rounded-full">
+                </div>
+                <span class="font-display text-lg sm:text-2xl font-extrabold tracking-tight">จัดการเวลาเที่ยว-ค่าใช้จ่าย</span>
+            </div>
+            
+            <button class="p-2.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors group ripple-button btn-scale theme-transition" onclick="toggleDarkMode()" aria-label="เปลี่ยนโหมดการแสดงผล">
+                <span class="material-symbols-outlined text-slate-600 dark:text-yellow-400 group-hover:text-primary" id="theme-icon">light_mode</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pt-28 pb-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            
+            <!-- Header Section -->
+            <div class="mb-8 theme-transition">
+                <h2 class="text-4xl font-display font-extrabold mb-2">ราคาน้ำมันวันนี้</h2>
+                <p class="text-slate-600 dark:text-slate-400">ตรวจสอบราคาน้ำมันล่าสุดจากสถานีบริการต่างๆ</p>
+            </div>
+
+            <!-- Date and Time Info -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 theme-transition">
+                <div class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-2xl p-6 border border-blue-200 dark:border-blue-800 transition-colors duration-300">
+                    <p class="text-sm text-blue-600 dark:text-blue-400 font-medium mb-1">วันที่ปัจจุบัน</p>
+                    <p id="currentDate" class="text-2xl font-bold text-blue-900 dark:text-blue-100">กำลังโหลด...</p>
+                </div>
+                
+                <div class="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-2xl p-6 border border-purple-200 dark:border-purple-800 transition-colors duration-300">
+                    <p class="text-sm text-purple-600 dark:text-purple-400 font-medium mb-1">เวลาอัปเดต</p>
+                    <p id="currentTime" class="text-2xl font-bold text-purple-900 dark:text-purple-100">กำลังโหลด...</p>
+                </div>
+                
+                <div class="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-2xl p-6 border border-green-200 dark:border-green-800 transition-colors duration-300">
+                    <p class="text-sm text-green-600 dark:text-green-400 font-medium mb-1">สถานะการเชื่อมต่อ</p>
+                    <p id="connectionStatus" class="text-2xl font-bold text-green-900 dark:text-green-100 flex items-center gap-2">
+                        <span class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+                        พร้อม
+                    </p>
+                </div>
+            </div>
+
+            <!-- Provider Selection -->
+            <div class="mb-8 theme-transition">
+                <label class="block text-sm font-semibold mb-3">เลือกสถานีบริการ</label>
+                <div class="relative">
+                    <button onclick="toggleProviderDropdown()" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-6 py-4 flex items-center justify-between hover:border-primary dark:hover:border-primary transition-colors ripple-button btn-scale theme-transition">
+                        <div class="flex items-center gap-3">
+                            <div id="triggerLogoBox" class="w-8 h-8">
+                                <span class="material-symbols-outlined text-slate-400">local_gas_station</span>
+                            </div>
+                            <span id="triggerText" class="font-semibold">เลือกสถานีบริการ</span>
+                        </div>
+                        <span class="material-symbols-outlined text-slate-400" id="dropdownIcon">expand_more</span>
+                    </button>
+                    
+                    <div id="providerDropdownList" class="hidden absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl z-40 max-h-96 overflow-y-auto custom-scrollbar theme-transition">
+                        <div id="providerListContent" class="p-3">
+                            <div class="flex justify-center py-8">
+                                <div class="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            <div id="errorMessage" class="hidden bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-4 mb-8 flex items-center gap-3 theme-transition">
+                <span class="material-symbols-outlined text-red-500">error</span>
+                <p id="errorText" class="text-red-700 dark:text-red-200 text-sm">ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ กรุณาลองใหม่</p>
+            </div>
+
+            <!-- Selected Station Info -->
+            <div class="bg-gradient-to-r from-primary/5 to-primary/10 dark:from-primary/20 dark:to-primary/10 rounded-3xl p-8 mb-8 border border-primary/20 theme-transition">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-16 h-16 bg-white dark:bg-slate-800 rounded-2xl p-2 flex items-center justify-center border-2 border-primary/20 theme-transition">
+                        <img id="selectedBrandLogo" src="" alt="Logo" class="w-full h-full object-contain hidden"/>
+                        <span id="defaultLogoIcon" class="material-symbols-outlined text-primary text-4xl">local_gas_station</span>
+                    </div>
+                    <div>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 mb-1">สถานีบริการปัจจุบัน</p>
+                        <h3 id="selectedBrandName" class="text-3xl font-display font-extrabold">เลือกสถานีบริการ</h3>
+                    </div>
+                </div>
+                
+                <div class="flex gap-4 flex-wrap">
+                    <button onclick="refreshPrices()" class="flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl transition-all neon-glow ripple-button btn-scale">
+                        <span class="material-symbols-outlined">refresh</span>
+                        <span>รีเฟรช</span>
+                    </button>
+                    <button onclick="sharePrice()" class="flex items-center gap-2 px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-primary dark:hover:border-primary text-slate-900 dark:text-slate-100 font-semibold rounded-xl transition-all ripple-button btn-scale theme-transition">
+                        <span class="material-symbols-outlined">share</span>
+                        <span>แชร์</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading Skeleton -->
+            <div id="priceLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                <div class="h-24 bg-slate-200 dark:bg-slate-700 rounded-2xl skeleton"></div>
+                <div class="h-24 bg-slate-200 dark:bg-slate-700 rounded-2xl skeleton"></div>
+                <div class="h-24 bg-slate-200 dark:bg-slate-700 rounded-2xl skeleton"></div>
+                <div class="h-24 bg-slate-200 dark:bg-slate-700 rounded-2xl skeleton"></div>
+                <div class="h-24 bg-slate-200 dark:bg-slate-700 rounded-2xl skeleton"></div>
+                <div class="h-24 bg-slate-200 dark:bg-slate-700 rounded-2xl skeleton"></div>
+            </div>
+
+            <!-- Price Grid -->
+            <div id="priceGrid" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Prices will be rendered here -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="hidden text-center py-16">
+                <div class="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 theme-transition">
+                    <span class="material-symbols-outlined text-slate-400 text-5xl">search_off</span>
+                </div>
+                <h3 class="text-2xl font-semibold mb-2">ยังไม่มีข้อมูล</h3>
+                <p class="text-slate-600 dark:text-slate-400">กรุณาเลือกสถานีบริการเพื่อแสดงราคาน้ำมัน</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl px-6 py-4 flex items-center gap-3 hidden z-50 slide-in theme-transition">
+        <span id="toastIcon" class="material-symbols-outlined text-green-500">check_circle</span>
+        <span id="toastMessage" class="text-sm font-medium">สำเร็จ</span>
+    </div>
+
+    <script>
+        // ============================================
+        // Configuration & Global Variables
+        // ============================================
+        let currentStation = null;
+        let globalData = null;
+
+        const stationMetadata = {
+            "PTT": { 
+                name: "สถานีปตท (PTT)", 
+                logo: "https://i.postimg.cc/L4tRS54Z/Logo.png",
+                color: "#ff6b35"
+            },
+            "BANGCHAK": { 
+                name: "สถานีบางจาก (BCP)", 
+                logo: "https://i.postimg.cc/zfCpBsL3/Logo.png",
+                color: "#1e90ff"
+            },
+            "SHELL": { 
+                name: "สถานีเชลล์ (Shell)", 
+                logo: "https://i.postimg.cc/zBq7RxWN/Logo.png",
+                color: "#ffcc00"
+            },
+            "CALTEX": { 
+                name: "สถานีแคลเท็กซ์ (Caltex)", 
+                logo: "https://i.postimg.cc/B685rbr7/Logo.png",
+                color: "#00a3e0"
+            },
+            "ESSO": { 
+                name: "สถานีเอสโซ่ (Esso)", 
+                logo: "https://i.postimg.cc/hjJ8kvk3/Logo.png",
+                color: "#e62e04"
+            },
+            "MOBIL": { 
+                name: "สถานีโมบิล (Mobil)", 
+                logo: "https://i.postimg.cc/XX6jYMnY/Logo.png",
+                color: "#e2001a"
+            }
+        };
+
+        // ============================================
+        // Mock Data for Testing (FIXED OIL NAMES)
+        // ============================================
+        const mockOilPrices = {
+            "PTT": {
+                "gasohol95": { 
+                    name: "แก๊สโซฮอล์ 95", 
+                    price: "33.45",
+                    previousPrice: "33.35",
+                    change: "+0.10",
+                    changePercent: "+0.30%",
+                    trend: "ขึ้น",
+                    highToday: "33.50",
+                    lowToday: "33.35",
+                    highMonth: "34.20",
+                    lowMonth: "32.80",
+                    highYear: "35.50",
+                    lowYear: "31.00",
+                    volatility: "ต่ำ"
+                },
+                "gasohol91": { 
+                    name: "แก๊สโซฮอล์ 91", 
+                    price: "32.15",
+                    previousPrice: "32.10",
+                    change: "+0.05",
+                    changePercent: "+0.16%",
+                    trend: "ขึ้น",
+                    highToday: "32.20",
+                    lowToday: "32.05",
+                    highMonth: "33.00",
+                    lowMonth: "31.50",
+                    highYear: "34.20",
+                    lowYear: "30.00",
+                    volatility: "ต่ำ"
+                },
+                "gasoholE20": { 
+                    name: "แก๊สโซฮอล์ E20", 
+                    price: "31.85",
+                    previousPrice: "31.75",
+                    change: "+0.10",
+                    changePercent: "+0.32%",
+                    trend: "ขึ้น",
+                    highToday: "31.95",
+                    lowToday: "31.75",
+                    highMonth: "32.80",
+                    lowMonth: "30.90",
+                    highYear: "33.50",
+                    lowYear: "29.20",
+                    volatility: "ต่ำ"
+                },
+                "gasoholE85": { 
+                    name: "แก๊สโซฮอล์ E85", 
+                    price: "28.50",
+                    previousPrice: "28.40",
+                    change: "+0.10",
+                    changePercent: "+0.35%",
+                    trend: "ขึ้น",
+                    highToday: "28.60",
+                    lowToday: "28.35",
+                    highMonth: "29.50",
+                    lowMonth: "27.80",
+                    highYear: "30.00",
+                    lowYear: "26.50",
+                    volatility: "ปานกลาง"
+                },
+                "diesel": { 
+                    name: "ดีเซล", 
+                    price: "30.65",
+                    previousPrice: "30.75",
+                    change: "-0.10",
+                    changePercent: "-0.33%",
+                    trend: "ลง",
+                    highToday: "30.80",
+                    lowToday: "30.60",
+                    highMonth: "31.50",
+                    lowMonth: "29.90",
+                    highYear: "32.00",
+                    lowYear: "28.50",
+                    volatility: "ปานกลาง"
+                },
+                "dieselB7": { 
+                    name: "ดีเซล B7", 
+                    price: "30.75",
+                    previousPrice: "30.85",
+                    change: "-0.10",
+                    changePercent: "-0.32%",
+                    trend: "ลง",
+                    highToday: "30.90",
+                    lowToday: "30.70",
+                    highMonth: "31.60",
+                    lowMonth: "30.00",
+                    highYear: "32.10",
+                    lowYear: "28.60",
+                    volatility: "ปานกลาง"
+                },
+                "dieselB20": { 
+                    name: "ดีเซล B20", 
+                    price: "29.95",
+                    previousPrice: "30.05",
+                    change: "-0.10",
+                    changePercent: "-0.33%",
+                    trend: "ลง",
+                    highToday: "30.10",
+                    lowToday: "29.90",
+                    highMonth: "30.80",
+                    lowMonth: "29.20",
+                    highYear: "31.40",
+                    lowYear: "27.80",
+                    volatility: "ปานกลาง"
+                },
+                "premiumDiesel": { 
+                    name: "ดีเซลพรีเมี่ยม", 
+                    price: "34.20",
+                    previousPrice: "34.10",
+                    change: "+0.10",
+                    changePercent: "+0.29%",
+                    trend: "ขึ้น",
+                    highToday: "34.30",
+                    lowToday: "34.15",
+                    highMonth: "35.00",
+                    lowMonth: "33.50",
+                    highYear: "36.50",
+                    lowYear: "32.00",
+                    volatility: "ต่ำ"
+                },
+                "premiumGasohol95": { 
+                    name: "เบนซิน 95 พรีเมี่ยม", 
+                    price: "36.80",
+                    previousPrice: "36.70",
+                    change: "+0.10",
+                    changePercent: "+0.27%",
+                    trend: "ขึ้น",
+                    highToday: "36.95",
+                    lowToday: "36.65",
+                    highMonth: "37.50",
+                    lowMonth: "35.80",
+                    highYear: "39.00",
+                    lowYear: "34.20",
+                    volatility: "ต่ำ"
+                },
+                "ngv": { 
+                    name: "ก๊าซธรรมชาติ (NGV)", 
+                    price: "16.45",
+                    previousPrice: "16.40",
+                    change: "+0.05",
+                    changePercent: "+0.30%",
+                    trend: "ขึ้น",
+                    highToday: "16.55",
+                    lowToday: "16.35",
+                    highMonth: "16.80",
+                    lowMonth: "15.95",
+                    highYear: "17.50",
+                    lowYear: "14.80",
+                    volatility: "ต่ำ"
+                }
+            },
+            "BANGCHAK": {
+                "gasohol95": { name: "แก๊สโซฮอล์ 95", price: "33.55", previousPrice: "33.45", change: "+0.10", changePercent: "+0.30%", trend: "ขึ้น", highToday: "33.65", lowToday: "33.45", highMonth: "34.30", lowMonth: "32.90", highYear: "35.60", lowYear: "31.10", volatility: "ต่ำ" },
+                "gasohol91": { name: "แก๊สโซฮอล์ 91", price: "32.25", previousPrice: "32.15", change: "+0.10", changePercent: "+0.31%", trend: "ขึ้น", highToday: "32.35", lowToday: "32.15", highMonth: "33.10", lowMonth: "31.60", highYear: "34.30", lowYear: "30.10", volatility: "ต่ำ" },
+                "gasoholE20": { name: "แก๊สโซฮอล์ E20", price: "31.95", previousPrice: "31.85", change: "+0.10", changePercent: "+0.31%", trend: "ขึ้น", highToday: "32.05", lowToday: "31.85", highMonth: "32.90", lowMonth: "31.00", highYear: "33.60", lowYear: "29.30", volatility: "ต่ำ" },
+                "gasoholE85": { name: "แก๊สโซฮอล์ E85", price: "28.60", previousPrice: "28.50", change: "+0.10", changePercent: "+0.35%", trend: "ขึ้น", highToday: "28.70", lowToday: "28.45", highMonth: "29.60", lowMonth: "27.90", highYear: "30.10", lowYear: "26.60", volatility: "ปานกลาง" },
+                "diesel": { name: "ดีเซล", price: "30.75", previousPrice: "30.85", change: "-0.10", changePercent: "-0.32%", trend: "ลง", highToday: "30.90", lowToday: "30.70", highMonth: "31.60", lowMonth: "30.00", highYear: "32.10", lowYear: "28.60", volatility: "ปานกลาง" },
+                "dieselB7": { name: "ดีเซล B7", price: "30.85", previousPrice: "30.95", change: "-0.10", changePercent: "-0.32%", trend: "ลง", highToday: "31.00", lowToday: "30.80", highMonth: "31.70", lowMonth: "30.10", highYear: "32.20", lowYear: "28.70", volatility: "ปานกลาง" },
+                "dieselB20": { name: "ดีเซล B20", price: "30.05", previousPrice: "30.15", change: "-0.10", changePercent: "-0.33%", trend: "ลง", highToday: "30.20", lowToday: "30.00", highMonth: "30.90", lowMonth: "29.30", highYear: "31.50", lowYear: "27.90", volatility: "ปานกลาง" },
+                "premiumDiesel": { name: "ดีเซลพรีเมี่ยม", price: "34.30", previousPrice: "34.20", change: "+0.10", changePercent: "+0.29%", trend: "ขึ้น", highToday: "34.40", lowToday: "34.25", highMonth: "35.10", lowMonth: "33.60", highYear: "36.60", lowYear: "32.10", volatility: "ต่ำ" },
+                "premiumGasohol95": { name: "เบนซิน 95 พรีเมี่ยม", price: "36.90", previousPrice: "36.80", change: "+0.10", changePercent: "+0.27%", trend: "ขึ้น", highToday: "37.05", lowToday: "36.75", highMonth: "37.60", lowMonth: "35.90", highYear: "39.10", lowYear: "34.30", volatility: "ต่ำ" },
+                "ngv": { name: "ก๊าซธรรมชาติ (NGV)", price: "16.55", previousPrice: "16.50", change: "+0.05", changePercent: "+0.30%", trend: "ขึ้น", highToday: "16.65", lowToday: "16.45", highMonth: "16.90", lowMonth: "16.05", highYear: "17.60", lowYear: "14.90", volatility: "ต่ำ" }
+            },
+            "SHELL": {
+                "gasohol95": { name: "แก๊สโซฮอล์ 95", price: "33.65", previousPrice: "33.55", change: "+0.10", changePercent: "+0.30%", trend: "ขึ้น", highToday: "33.75", lowToday: "33.55", highMonth: "34.40", lowMonth: "33.00", highYear: "35.70", lowYear: "31.20", volatility: "ต่ำ" },
+                "gasohol91": { name: "แก๊สโซฮอล์ 91", price: "32.35", previousPrice: "32.25", change: "+0.10", changePercent: "+0.31%", trend: "ขึ้น", highToday: "32.45", lowToday: "32.25", highMonth: "33.20", lowMonth: "31.70", highYear: "34.40", lowYear: "30.20", volatility: "ต่ำ" },
+                "gasoholE20": { name: "แก๊สโซฮอล์ E20", price: "32.05", previousPrice: "31.95", change: "+0.10", changePercent: "+0.31%", trend: "ขึ้น", highToday: "32.15", lowToday: "31.95", highMonth: "33.00", lowMonth: "31.10", highYear: "33.70", lowYear: "29.40", volatility: "ต่ำ" },
+                "gasoholE85": { name: "แก๊สโซฮอล์ E85", price: "28.70", previousPrice: "28.60", change: "+0.10", changePercent: "+0.35%", trend: "ขึ้น", highToday: "28.80", lowToday: "28.55", highMonth: "29.70", lowMonth: "28.00", highYear: "30.20", lowYear: "26.70", volatility: "ปานกลาง" },
+                "diesel": { name: "ดีเซล", price: "30.85", previousPrice: "30.95", change: "-0.10", changePercent: "-0.32%", trend: "ลง", highToday: "31.00", lowToday: "30.80", highMonth: "31.70", lowMonth: "30.10", highYear: "32.20", lowYear: "28.70", volatility: "ปานกลาง" },
+                "dieselB7": { name: "ดีเซล B7", price: "30.95", previousPrice: "31.05", change: "-0.10", changePercent: "-0.32%", trend: "ลง", highToday: "31.10", lowToday: "30.90", highMonth: "31.80", lowMonth: "30.20", highYear: "32.30", lowYear: "28.80", volatility: "ปานกลาง" },
+                "dieselB20": { name: "ดีเซล B20", price: "30.15", previousPrice: "30.25", change: "-0.10", changePercent: "-0.33%", trend: "ลง", highToday: "30.30", lowToday: "30.10", highMonth: "31.00", lowMonth: "29.40", highYear: "31.60", lowYear: "28.00", volatility: "ปานกลาง" },
+                "premiumDiesel": { name: "ดีเซลพรีเมี่ยม", price: "34.40", previousPrice: "34.30", change: "+0.10", changePercent: "+0.29%", trend: "ขึ้น", highToday: "34.50", lowToday: "34.35", highMonth: "35.20", lowMonth: "33.70", highYear: "36.70", lowYear: "32.20", volatility: "ต่ำ" },
+                "premiumGasohol95": { name: "เบนซิน 95 พรีเมี่ยม", price: "37.00", previousPrice: "36.90", change: "+0.10", changePercent: "+0.27%", trend: "ขึ้น", highToday: "37.15", lowToday: "36.85", highMonth: "37.70", lowMonth: "36.00", highYear: "39.20", lowYear: "34.40", volatility: "ต่ำ" },
+                "ngv": { name: "ก๊าซธรรมชาติ (NGV)", price: "16.65", previousPrice: "16.60", change: "+0.05", changePercent: "+0.30%", trend: "ขึ้น", highToday: "16.75", lowToday: "16.55", highMonth: "17.00", lowMonth: "16.15", highYear: "17.70", lowYear: "15.00", volatility: "ต่ำ" }
+            },
+            "CALTEX": {
+                "gasohol95": { name: "แก๊สโซฮอล์ 95", price: "33.75", previousPrice: "33.65", change: "+0.10", changePercent: "+0.30%", trend: "ขึ้น", highToday: "33.85", lowToday: "33.65", highMonth: "34.50", lowMonth: "33.10", highYear: "35.80", lowYear: "31.30", volatility: "ต่ำ" },
+                "gasohol91": { name: "แก๊สโซฮอล์ 91", price: "32.45", previousPrice: "32.35", change: "+0.10", changePercent: "+0.31%", trend: "ขึ้น", highToday: "32.55", lowToday: "32.35", highMonth: "33.30", lowMonth: "31.80", highYear: "34.50", lowYear: "30.30", volatility: "ต่ำ" },
+                "gasoholE20": { name: "แก๊สโซฮอล์ E20", price: "32.15", previousPrice: "32.05", change: "+0.10", changePercent: "+0.31%", trend: "ขึ้น", highToday: "32.25", lowToday: "32.05", highMonth: "33.10", lowMonth: "31.20", highYear: "33.80", lowYear: "29.50", volatility: "ต่ำ" },
+                "gasoholE85": { name: "แก๊สโซฮอล์ E85", price: "28.80", previousPrice: "28.70", change: "+0.10", changePercent: "+0.35%", trend: "ขึ้น", highToday: "28.90", lowToday: "28.65", highMonth: "29.80", lowMonth: "28.10", highYear: "30.30", lowYear: "26.80", volatility: "ปานกลาง" },
+                "diesel": { name: "ดีเซล", price: "30.95", previousPrice: "31.05", change: "-0.10", changePercent: "-0.32%", trend: "ลง", highToday: "31.10", lowToday: "30.90", highMonth: "31.80", lowMonth: "30.20", highYear: "32.30", lowYear: "28.80", volatility: "ปานกลาง" },
+                "dieselB7": { name: "ดีเซล B7", price: "31.05", previousPrice: "31.15", change: "-0.10", changePercent: "-0.32%", trend: "ลง", highToday: "31.20", lowToday: "31.00", highMonth: "31.90", lowMonth: "30.30", highYear: "32.40", lowYear: "28.90", volatility: "ปานกลาง" },
+                "dieselB20": { name: "ดีเซล B20", price: "30.25", previousPrice: "30.35", change: "-0.10", changePercent: "-0.33%", trend: "ลง", highToday: "30.40", lowToday: "30.20", highMonth: "31.10", lowMonth: "29.50", highYear: "31.70", lowYear: "28.10", volatility: "ปานกลาง" },
+                "premiumDiesel": { name: "ดีเซลพรีเมี่ยม", price: "34.50", previousPrice: "34.40", change: "+0.10", changePercent: "+0.29%", trend: "ขึ้น", highToday: "34.60", lowToday: "34.45", highMonth: "35.30", lowMonth: "33.80", highYear: "36.80", lowYear: "32.30", volatility: "ต่ำ" },
+                "premiumGasohol95": { name: "เบนซิน 95 พรีเมี่ยม", price: "37.10", previousPrice: "37.00", change: "+0.10", changePercent: "+0.27%", trend: "ขึ้น", highToday: "37.25", lowToday: "36.95", highMonth: "37.80", lowMonth: "36.10", highYear: "39.30", lowYear: "34.50", volatility: "ต่ำ" },
+                "ngv": { name: "ก๊าซธรรมชาติ (NGV)", price: "16.75", previousPrice: "16.70", change: "+0.05", changePercent: "+0.30%", trend: "ขึ้น", highToday: "16.85", lowToday: "16.65", highMonth: "17.10", lowMonth: "16.25", highYear: "17.80", lowYear: "15.10", volatility: "ต่ำ" }
+            },
+            "ESSO": {
+                "gasohol95": { name: "แก๊สโซฮอล์ 95", price: "33.35", previousPrice: "33.25", change: "+0.10", changePercent: "+0.30%", trend: "ขึ้น", highToday: "33.45", lowToday: "33.25", highMonth: "34.10", lowMonth: "32.70", highYear: "35.40", lowYear: "30.90", volatility: "ต่ำ" },
+                "gasohol91": { name: "แก๊สโซฮอล์ 91", price: "32.05", previousPrice: "31.95", change: "+0.10", changePercent: "+0.31%", trend: "ขึ้น", highToday: "32.15", lowToday: "31.95", highMonth: "32.90", lowMonth: "31.40", highYear: "34.10", lowYear: "29.90", volatility: "ต่ำ" },
+                "gasoholE20": { name: "แก๊สโซฮอล์ E20", price: "31.75", previousPrice: "31.65", change: "+0.10", changePercent: "+0.32%", trend: "ขึ้น", highToday: "31.85", lowToday: "31.65", highMonth: "32.70", lowMonth: "30.80", highYear: "33.40", lowYear: "29.10", volatility: "ต่ำ" },
+                "gasoholE85": { name: "แก๊สโซฮอล์ E85", price: "28.40", previousPrice: "28.30", change: "+0.10", changePercent: "+0.35%", trend: "ขึ้น", highToday: "28.50", lowToday: "28.25", highMonth: "29.40", lowMonth: "27.70", highYear: "29.90", lowYear: "26.40", volatility: "ปานกลาง" },
+                "diesel": { name: "ดีเซล", price: "30.55", previousPrice: "30.65", change: "-0.10", changePercent: "-0.33%", trend: "ลง", highToday: "30.70", lowToday: "30.50", highMonth: "31.40", lowMonth: "29.80", highYear: "31.90", lowYear: "28.40", volatility: "ปานกลาง" },
+                "dieselB7": { name: "ดีเซล B7", price: "30.65", previousPrice: "30.75", change: "-0.10", changePercent: "-0.33%", trend: "ลง", highToday: "30.80", lowToday: "30.60", highMonth: "31.50", lowMonth: "29.90", highYear: "32.00", lowYear: "28.50", volatility: "ปานกลาง" },
+                "dieselB20": { name: "ดีเซล B20", price: "29.85", previousPrice: "29.95", change: "-0.10", changePercent: "-0.33%", trend: "ลง", highToday: "30.00", lowToday: "29.80", highMonth: "30.70", lowMonth: "29.10", highYear: "31.30", lowYear: "27.70", volatility: "ปานกลาง" },
+                "premiumDiesel": { name: "ดีเซลพรีเมี่ยม", price: "34.10", previousPrice: "34.00", change: "+0.10", changePercent: "+0.29%", trend: "ขึ้น", highToday: "34.20", lowToday: "34.05", highMonth: "34.90", lowMonth: "33.40", highYear: "36.40", lowYear: "31.90", volatility: "ต่ำ" },
+                "premiumGasohol95": { name: "เบนซิน 95 พรีเมี่ยม", price: "36.70", previousPrice: "36.60", change: "+0.10", changePercent: "+0.27%", trend: "ขึ้น", highToday: "36.85", lowToday: "36.55", highMonth: "37.40", lowMonth: "35.70", highYear: "38.90", lowYear: "34.10", volatility: "ต่ำ" },
+                "ngv": { name: "ก๊าซธรรมชาติ (NGV)", price: "16.35", previousPrice: "16.30", change: "+0.05", changePercent: "+0.31%", trend: "ขึ้น", highToday: "16.45", lowToday: "16.25", highMonth: "16.70", lowMonth: "15.85", highYear: "17.40", lowYear: "14.70", volatility: "ต่ำ" }
+            },
+            "MOBIL": {
+                "gasohol95": { name: "แก๊สโซฮอล์ 95", price: "33.85", previousPrice: "33.75", change: "+0.10", changePercent: "+0.30%", trend: "ขึ้น", highToday: "33.95", lowToday: "33.75", highMonth: "34.60", lowMonth: "33.20", highYear: "35.90", lowYear: "31.40", volatility: "ต่ำ" },
+                "gasohol91": { name: "แก๊สโซฮอล์ 91", price: "32.55", previousPrice: "32.45", change: "+0.10", changePercent: "+0.31%", trend: "ขึ้น", highToday: "32.65", lowToday: "32.45", highMonth: "33.40", lowMonth: "31.90", highYear: "34.60", lowYear: "30.40", volatility: "ต่ำ" },
+                "gasoholE20": { name: "แก๊สโซฮอล์ E20", price: "32.25", previousPrice: "32.15", change: "+0.10", changePercent: "+0.31%", trend: "ขึ้น", highToday: "32.35", lowToday: "32.15", highMonth: "33.20", lowMonth: "31.30", highYear: "33.90", lowYear: "29.60", volatility: "ต่ำ" },
+                "gasoholE85": { name: "แก๊สโซฮอล์ E85", price: "28.90", previousPrice: "28.80", change: "+0.10", changePercent: "+0.35%", trend: "ขึ้น", highToday: "29.00", lowToday: "28.75", highMonth: "29.90", lowMonth: "28.20", highYear: "30.40", lowYear: "26.90", volatility: "ปานกลาง" },
+                "diesel": { name: "ดีเซล", price: "31.05", previousPrice: "31.15", change: "-0.10", changePercent: "-0.32%", trend: "ลง", highToday: "31.20", lowToday: "31.00", highMonth: "31.90", lowMonth: "30.30", highYear: "32.40", lowYear: "28.90", volatility: "ปานกลาง" },
+                "dieselB7": { name: "ดีเซล B7", price: "31.15", previousPrice: "31.25", change: "-0.10", changePercent: "-0.32%", trend: "ลง", highToday: "31.30", lowToday: "31.10", highMonth: "32.00", lowMonth: "30.40", highYear: "32.50", lowYear: "29.00", volatility: "ปานกลาง" },
+                "dieselB20": { name: "ดีเซล B20", price: "30.35", previousPrice: "30.45", change: "-0.10", changePercent: "-0.33%", trend: "ลง", highToday: "30.50", lowToday: "30.30", highMonth: "31.20", lowMonth: "29.60", highYear: "31.80", lowYear: "28.20", volatility: "ปานกลาง" },
+                "premiumDiesel": { name: "ดีเซลพรีเมี่ยม", price: "34.60", previousPrice: "34.50", change: "+0.10", changePercent: "+0.29%", trend: "ขึ้น", highToday: "34.70", lowToday: "34.55", highMonth: "35.40", lowMonth: "33.90", highYear: "36.90", lowYear: "32.40", volatility: "ต่ำ" },
+                "premiumGasohol95": { name: "เบนซิน 95 พรีเมี่ยม", price: "37.20", previousPrice: "37.10", change: "+0.10", changePercent: "+0.27%", trend: "ขึ้น", highToday: "37.35", lowToday: "37.05", highMonth: "37.90", lowMonth: "36.20", highYear: "39.40", lowYear: "34.60", volatility: "ต่ำ" },
+                "ngv": { name: "ก๊าซธรรมชาติ (NGV)", price: "16.85", previousPrice: "16.80", change: "+0.05", changePercent: "+0.30%", trend: "ขึ้น", highToday: "16.95", lowToday: "16.75", highMonth: "17.20", lowMonth: "16.35", highYear: "17.90", lowYear: "15.20", volatility: "ต่ำ" }
+            }
+        };
+
+        // ============================================
+        // Dark Mode Toggle with Smooth Transition
+        // ============================================
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            html.classList.toggle("dark");
+            
+            const isDark = html.classList.contains("dark");
+            document.getElementById("theme-icon").textContent = isDark ? "light_mode" : "dark_mode";
+            localStorage.theme = isDark ? "dark" : "light";
+        }
+
+        // ============================================
+        // Initialize Theme
+        // ============================================
+        function initializeTheme() {
+            if (localStorage.theme === "light" || (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: light)").matches)) {
+                document.documentElement.classList.remove("dark");
+                document.getElementById("theme-icon").innerText = "dark_mode";
+            } else {
+                document.documentElement.classList.add("dark");
+                document.getElementById("theme-icon").innerText = "light_mode";
+            }
+        }
+
+        // ============================================
+        // Date and Time Functions
+        // ============================================
+        function updateDateTime() {
+            const now = new Date();
+            
+            // Format date in Thai
+            const day = now.getDate();
+            const month = now.getMonth();
+            const year = now.getFullYear() + 543;
+            const monthsShort = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+            
+            document.getElementById("currentDate").textContent = `${day} ${monthsShort[month]} ${year}`;
+            
+            // Format time
+            const hours = String(now.getHours()).padStart(2, "0");
+            const minutes = String(now.getMinutes()).padStart(2, "0");
+            const seconds = String(now.getSeconds()).padStart(2, "0");
+            
+            document.getElementById("currentTime").textContent = `${hours}:${minutes}:${seconds}`;
+        }
+
+        // ============================================
+        // Oil Style (Color Coding)
+        // ============================================
+        function getOilStyle(oilName) {
+            const styles = {
+                "แก๊สโซฮอล์ 95": { color: "text-red-600 dark:text-red-400", bg: "bg-red-50 dark:bg-red-900/10", border: "border-red-300 dark:border-red-700" },
+                "แก๊สโซฮอล์ 91": { color: "text-orange-600 dark:text-orange-400", bg: "bg-orange-50 dark:bg-orange-900/10", border: "border-orange-300 dark:border-orange-700" },
+                "แก๊สโซฮอล์ E20": { color: "text-green-600 dark:text-green-400", bg: "bg-green-50 dark:bg-green-900/10", border: "border-green-300 dark:border-green-700" },
+                "แก๊สโซฮอล์ E85": { color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-900/10", border: "border-emerald-300 dark:border-emerald-700" },
+                "ดีเซล": { color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-50 dark:bg-blue-900/10", border: "border-blue-300 dark:border-blue-700" },
+                "ดีเซล B7": { color: "text-cyan-600 dark:text-cyan-400", bg: "bg-cyan-50 dark:bg-cyan-900/10", border: "border-cyan-300 dark:border-cyan-700" },
+                "ดีเซล B20": { color: "text-teal-600 dark:text-teal-400", bg: "bg-teal-50 dark:bg-teal-900/10", border: "border-teal-300 dark:border-teal-700" },
+                "ดีเซลพรีเมี่ยม": { color: "text-violet-600 dark:text-violet-400", bg: "bg-violet-50 dark:bg-violet-900/10", border: "border-violet-300 dark:border-violet-700" },
+                "เบนซิน 95 พรีเมี่ยม": { color: "text-purple-600 dark:text-purple-400", bg: "bg-purple-50 dark:bg-purple-900/10", border: "border-purple-300 dark:border-purple-700" },
+                "ก๊าซธรรมชาติ (NGV)": { color: "text-indigo-600 dark:text-indigo-400", bg: "bg-indigo-50 dark:bg-indigo-900/10", border: "border-indigo-300 dark:border-indigo-700" }
+            };
+            
+            return styles[oilName] || { color: "text-slate-600 dark:text-slate-400", bg: "bg-slate-50 dark:bg-slate-800", border: "border-slate-300 dark:border-slate-700" };
+        }
+
+        // ============================================
+        // Error & Toast Functions
+        // ============================================
+        function showErrorMessage(message) {
+            const errorDiv = document.getElementById("errorMessage");
+            const errorText = document.getElementById("errorText");
+            errorText.textContent = message;
+            errorDiv.classList.remove("hidden");
+        }
+
+        function hideErrorMessage() {
+            document.getElementById("errorMessage").classList.add("hidden");
+        }
+
+        function showToast(message, type = "success") {
+            const toast = document.getElementById("toast");
+            const toastMessage = document.getElementById("toastMessage");
+            const toastIcon = document.getElementById("toastIcon");
+            
+            toastMessage.textContent = message;
+            
+            if (type === "success") {
+                toastIcon.textContent = "check_circle";
+                toastIcon.className = "material-symbols-outlined text-green-500";
+            } else if (type === "error") {
+                toastIcon.textContent = "error";
+                toastIcon.className = "material-symbols-outlined text-red-500";
+            }
+            
+            toast.classList.remove("hidden");
+            
+            setTimeout(() => {
+                toast.classList.add("hidden");
+            }, 3000);
+        }
+
+        // ============================================
+        // Dropdown Functions
+        // ============================================
+        function toggleProviderDropdown() {
+            const dropdown = document.getElementById("providerDropdownList");
+            const icon = document.getElementById("dropdownIcon");
+            
+            dropdown.classList.toggle("hidden");
+            icon.style.transform = dropdown.classList.contains("hidden") ? "rotate(0deg)" : "rotate(180deg)";
+        }
+
+        document.addEventListener("click", function(e) {
+            const dropdown = document.getElementById("providerDropdownList");
+            const button = e.target.closest("button[onclick='toggleProviderDropdown()']");
+            
+            if (!button && !dropdown.contains(e.target)) {
+                dropdown.classList.add("hidden");
+                document.getElementById("dropdownIcon").style.transform = "rotate(0deg)";
+            }
+        });
+
+        // ============================================
+        // Render Functions
+        // ============================================
+        function renderProviderDropdown() {
+            const container = document.getElementById("providerListContent");
+            
+            if (!globalData || !globalData.stations) {
+                container.innerHTML = '<p class="text-slate-500 dark:text-slate-400 p-4 text-sm">ไม่มีข้อมูลสถานี</p>';
+                return;
+            }
+            
+            let html = "";
+            
+            Object.keys(globalData.stations).forEach(key => {
+                const meta = stationMetadata[key];
+                const logoHtml = meta && meta.logo 
+                    ? `<img src="${meta.logo}" alt="${meta.name}" class="w-8 h-8 object-contain" onerror="this.style.display='none'">`
+                    : `<span class="material-symbols-outlined text-slate-400">local_gas_station</span>`;
+                
+                html += `
+                <div onclick="selectStation('${key}')" 
+                     class="flex items-center gap-3 p-4 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700/50 cursor-pointer transition-colors group ripple-button">
+                    <div class="w-10 h-10 bg-white dark:bg-slate-700 rounded-lg p-1.5 flex items-center justify-center border border-slate-100 dark:border-slate-600 group-hover:border-primary/30 transition-colors">
+                        ${logoHtml}
+                    </div>
+                    <span class="font-medium text-slate-700 dark:text-slate-200">${meta ? meta.name : key}</span>
+                    ${key === currentStation ? '<span class="ml-auto material-symbols-outlined text-primary">check</span>' : ''}
+                </div>`;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        async function selectStation(key) {
+            if (!globalData || !globalData.stations[key]) return;
+            
+            currentStation = key;
+            const meta = stationMetadata[key];
+            
+            // Update trigger button
+            const triggerText = document.getElementById("triggerText");
+            const triggerLogoBox = document.getElementById("triggerLogoBox");
+            
+            triggerText.innerText = meta ? meta.name : key;
+            if (meta && meta.logo) {
+                triggerLogoBox.innerHTML = `<img src="${meta.logo}" alt="${meta.name}" class="w-8 h-8 object-contain" onerror="this.style.display='none'"/>`;
+            } else {
+                triggerLogoBox.innerHTML = `<span class="material-symbols-outlined text-slate-400">local_gas_station</span>`;
+            }
+            
+            // Close dropdown
+            document.getElementById("providerDropdownList").classList.add("hidden");
+            document.getElementById("dropdownIcon").style.transform = "rotate(0deg)";
+            
+            // Re-render dropdown
+            renderProviderDropdown();
+            
+            // Update selected brand info
+            const logoImg = document.getElementById("selectedBrandLogo");
+            const defaultIcon = document.getElementById("defaultLogoIcon");
+            const brandName = document.getElementById("selectedBrandName");
+            
+            brandName.textContent = meta ? meta.name : key;
+            
+            if (meta && meta.logo) {
+                logoImg.src = meta.logo;
+                logoImg.classList.remove("hidden");
+                defaultIcon.classList.add("hidden");
+            } else {
+                logoImg.classList.add("hidden");
+                defaultIcon.classList.remove("hidden");
+            }
+            
+            // Fetch and display prices
+            await refreshPrices();
+        }
+
+        async function refreshPrices() {
+            if (!currentStation) {
+                document.getElementById("emptyState").classList.remove("hidden");
+                return;
+            }
+            
+            const loader = document.getElementById("priceLoading");
+            const grid = document.getElementById("priceGrid");
+            const empty = document.getElementById("emptyState");
+            
+            loader.classList.remove("hidden");
+            grid.classList.add("hidden");
+            empty.classList.add("hidden");
+            hideErrorMessage();
+            
+            const priceData = mockOilPrices[currentStation] || {};
+            
+            if (!priceData || Object.keys(priceData).length === 0) {
+                loader.classList.add("hidden");
+                empty.classList.remove("hidden");
+                showErrorMessage("ไม่มีข้อมูลราคา กรุณาเลือกสถานีอื่น");
+                return;
+            }
+            
+            renderPricesList(priceData);
+        }
+
+        function renderPricesList(data) {
+            const container = document.getElementById("priceGrid");
+            const loader = document.getElementById("priceLoading");
+            const empty = document.getElementById("emptyState");
+            
+            loader.classList.add("hidden");
+            container.classList.remove("hidden");
+            empty.classList.add("hidden");
+            hideErrorMessage();
+            
+            let html = "";
+            const order = ["gasohol95", "gasohol91", "gasoholE20", "gasoholE85", "diesel", "dieselB7", "dieselB20", "premiumDiesel", "premiumGasohol95", "ngv"];
+            const allKeys = Object.keys(data);
+            const orderedKeys = [...new Set([...order, ...allKeys])];
+            
+            orderedKeys.forEach(oilKey => {
+                if (data[oilKey]) {
+                    const item = data[oilKey];
+                    if (!item.price || item.price === "") return;
+                    
+                    const styles = getOilStyle(item.name);
+                    const changeColor = item.trend === "ขึ้น" ? "text-red-500" : item.trend === "ลง" ? "text-green-500" : "text-gray-500";
+                    const changeIcon = item.trend === "ขึ้น" ? "▲" : item.trend === "ลง" ? "▼" : "→";
+                    
+                    html += `
+                    <div class="flex flex-col p-6 bg-white dark:bg-slate-800 rounded-2xl ${styles.border} border-l-4 hover-lift shadow-sm dark:shadow-sm ripple-button theme-transition">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-lg font-semibold text-slate-900 dark:text-slate-100">${item.name}</span>
+                            <span class="text-xs font-medium text-slate-400">บาท/ลิตร</span>
+                        </div>
+                        
+                        <div class="flex items-baseline gap-2 mb-4">
+                            <span class="text-4xl font-display font-extrabold ${styles.color}">${item.price}</span>
+                            <span class="text-xs text-slate-500 dark:text-slate-400 line-through">${item.previousPrice}</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-2 text-xs mb-3 pb-3 border-t border-slate-200 dark:border-slate-700">
+                            <div>
+                                <p class="text-slate-500 dark:text-slate-400 mb-1">การเปลี่ยนแปลง</p>
+                                <p class="${changeColor} font-semibold flex items-center gap-1">
+                                    ${changeIcon} ${item.change} (${item.changePercent})
+                                </p>
+                            </div>
+                            <div>
+                                <p class="text-slate-500 dark:text-slate-400 mb-1">แนวโน้ม</p>
+                                <p class="${changeColor} font-semibold">${item.trend}</p>
+                            </div>
+                            <div>
+                                <p class="text-slate-500 dark:text-slate-400 mb-1">สูงสุด/ต่ำสุด (วัน)</p>
+                                <p class="text-slate-700 dark:text-slate-300 font-medium">${item.highToday} / ${item.lowToday}</p>
+                            </div>
+                            <div>
+                                <p class="text-slate-500 dark:text-slate-400 mb-1">สูงสุด/ต่ำสุด (เดือน)</p>
+                                <p class="text-slate-700 dark:text-slate-300 font-medium">${item.highMonth} / ${item.lowMonth}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div>
+                                <p class="text-slate-500 dark:text-slate-400 mb-1">สูงสุด/ต่ำสุด (ปี)</p>
+                                <p class="text-slate-700 dark:text-slate-300 font-medium">${item.highYear} / ${item.lowYear}</p>
+                            </div>
+                            <div>
+                                <p class="text-slate-500 dark:text-slate-400 mb-1">ความผันผวน</p>
+                                <p class="text-slate-700 dark:text-slate-300 font-medium">${item.volatility}</p>
+                            </div>
+                        </div>
+                    </div>`;
+                }
+            });
+            
+            if (html === "") {
+                loader.classList.add("hidden");
+                empty.classList.remove("hidden");
+            } else {
+                container.innerHTML = html;
+            }
+        }
+
+        function sharePrice() {
+            if (!currentStation) {
+                showToast("กรุณาเลือกสถานีบริการก่อน", "error");
+                return;
+            }
+            
+            const meta = stationMetadata[currentStation];
+            const shareText = `เช็คราคาน้ำมันล่าสุดที่ ${meta ? meta.name : currentStation} - ${window.location.href}`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: "ราคาน้ำมันวันนี้",
+                    text: shareText,
+                    url: window.location.href
+                });
+            } else {
+                navigator.clipboard.writeText(shareText).then(() => {
+                    showToast("คัดลอกลิงก์เรียบร้อยแล้ว!", "success");
+                });
+            }
+        }
+
+        // ============================================
+        // Initialize App
+        // ============================================
+        async function initializeApp() {
+            globalData = { stations: mockOilPrices };
+            renderProviderDropdown();
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            
+            document.getElementById("emptyState").classList.add("hidden");
+            document.getElementById("pageLoader").classList.add("hidden");
+            
+            // Auto-select PTT on page load
+            await selectStation("PTT");
+        }
+
+        // ============================================
+        // App Start
+        // ============================================
+        window.addEventListener("load", function() {
+            initializeTheme();
+            
+            setTimeout(() => {
+                initializeApp();
+            }, 500);
+        });
+    </script>
+</body>
+</html>

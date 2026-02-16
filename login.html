@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="th" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="theme-color" content="#6366f1">
+  <meta name="description" content="เข้าสู่ระบบ - จัดการเวลาเที่ยว-ค่าใช้จ่าย">
+  <title>เข้าสู่ระบบ - จัดการเวลาเที่ยว-ค่าใช้จ่าย</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="utils.js" defer></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Kanit', 'sans-serif'] },
+          animation: {
+            'fade-in-scale': 'fadeInScale 0.5s ease-out',
+          },
+          keyframes: {
+            fadeInScale: {
+              '0%': { opacity: '0', transform: 'scale(0.95)' },
+              '100%': { opacity: '1', transform: 'scale(1)' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    * {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      overflow-x: hidden;
+    }
+
+    body {
+      font-family: 'Kanit', sans-serif;
+      overflow-x: hidden;
+    }
+
+    .bg-slider {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      transition: opacity 1.5s ease-in-out;
+      opacity: 0;
+      will-change: opacity;
+    }
+
+    @media (max-width: 768px) {
+      .bg-slider {
+        background-attachment: scroll;
+      }
+    }
+
+    .bg-slider.active {
+      opacity: 1;
+    }
+
+    .error-message {
+      display: none;
+      color: #ef4444;
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+    }
+
+    .input-field {
+      transition: all 0.3s ease;
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: #6366f1 !important;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+    }
+
+    .input-field.error {
+      border-color: #ef4444 !important;
+    }
+
+    .toggle-password {
+      user-select: none;
+      transition: color 0.2s ease;
+    }
+
+    .toggle-password:hover {
+      color: #4f46e5 !important;
+    }
+
+    .ripple-btn {
+      position: relative;
+      overflow: hidden;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .ripple-btn::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.35);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .ripple-btn:active::after {
+      width: 200px;
+      height: 200px;
+      opacity: 1;
+      transition: width 0.6s ease-out, height 0.6s ease-out, opacity 0.6s ease-out;
+    }
+
+    .dark .ripple-btn.bg-white::after {
+      background: rgba(99, 102, 241, 0.2);
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .spinner {
+      animation: spin 1s linear infinite;
+    }
+
+    /* Modal */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      padding: 1rem;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-content {
+      background: white;
+      max-width: 90%;
+      width: 520px;
+      border-radius: 16px;
+      padding: 2.5rem 2rem 2rem;
+      position: relative;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+      transform: scale(0.9);
+      transition: transform 0.3s ease;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .dark .modal-content {
+      background: #1e293b;
+      color: #e2e8f0;
+    }
+
+    .modal.show .modal-content {
+      transform: scale(1);
+    }
+
+    .modal-icon-img {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1.5rem;
+      display: block;
+      border-radius: 50%;
+      object-fit: contain;
+      box-shadow: 0 8px 20px rgba(99,102,241,0.3);
+    }
+
+    @media (max-width: 640px) {
+      .modal-icon-img {
+        width: 64px;
+        height: 64px;
+      }
+
+      .modal-content {
+        width: 95%;
+        padding: 2rem 1.5rem;
+      }
+    }
+
+    .dark .modal-icon-img {
+      box-shadow: 0 8px 20px rgba(99,102,241,0.5);
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1.5rem;
+      font-size: 2rem;
+      cursor: pointer;
+      color: #6b7280;
+      transition: color 0.2s ease;
+    }
+
+    .close-btn:hover {
+      color: #1f2937;
+    }
+
+    .dark .close-btn {
+      color: #9ca3af;
+    }
+
+    .dark .close-btn:hover {
+      color: #f1f5f9;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800">
+
+  <!-- Background Slider -->
+  <div class="fixed inset-0 z-0 hidden sm:block">
+    <div id="bg1" class="bg-slider active" style="background-image: url('https://img5.pic.in.th/file/secure-sv1/1000478230.png');"></div>
+    <div id="bg2" class="bg-slider" style="background-image: url('https://img2.pic.in.th/1000478232.png');"></div>
+    <div id="bg3" class="bg-slider" style="background-image: url('https://img2.pic.in.th/1000478233.png');"></div>
+    <div id="bg4" class="bg-slider" style="background-image: url('https://img2.pic.in.th/1000480947.jpg');"></div>
+    <div id="bg5" class="bg-slider" style="background-image: url('https://img5.pic.in.th/file/secure-sv1/1000480946.jpg');"></div>
+    <div id="bg6" class="bg-slider" style="background-image: url('https://img2.pic.in.th/1000480945.jpg');"></div>
+    <div class="absolute inset-0 bg-black/55"></div>
+  </div>
+
+  <div class="relative z-10 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 sm:p-8 w-full max-w-md mx-4 sm:mx-0 animate-fade-in-scale">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-8">
+      <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+        <img src="https://i.postimg.cc/d3Jnyv2F/11zon-cropped.png" alt="โลโก้" class="w-10 h-10 rounded-full object-cover flex-shrink-0" loading="lazy">
+        <h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white truncate">เข้าสู่ระบบ</h1>
+      </div>
+      <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition flex-shrink-0" aria-label="สลับธีม">
+        <span id="theme-icon" class="material-symbols-outlined text-gray-600 dark:text-gray-300">dark_mode</span>
+      </button>
+    </div>
+
+    <!-- Login Form -->
+    <form id="loginForm" class="space-y-6" novalidate>
+      <!-- Email Field -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">อีเมลหรือชื่อผู้ใช้</label>
+        <input 
+          type="email" 
+          id="email" 
+          class="input-field w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 transition text-sm sm:text-base" 
+          placeholder="ตัวอย่าง: soda@example.com" 
+          required
+          autocomplete="email"
+        >
+        <p id="emailError" class="error-message">กรุณากรอกอีเมลให้ถูกต้อง</p>
+      </div>
+
+      <!-- Password Field -->
+      <div class="input-group relative">
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">รหัสผ่าน</label>
+        <input 
+          type="password" 
+          id="password" 
+          class="input-field w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 transition pr-10 text-sm sm:text-base" 
+          placeholder="••••••••" 
+          required 
+          minlength="6"
+          autocomplete="current-password"
+        >
+        <span id="togglePassword" class="toggle-password material-symbols-outlined absolute right-3 top-10 text-gray-500 dark:text-gray-400 cursor-pointer select-none hover:text-indigo-600 dark:hover:text-indigo-400">visibility</span>
+        <p id="passwordError" class="error-message">รหัสผ่านต้องไม่น้อยกว่า 6 ตัวอักษร</p>
+      </div>
+
+      <!-- Remember Me & Forgot Password -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-sm">
+        <label class="flex items-center cursor-pointer">
+          <input type="checkbox" id="rememberMe" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+          <span class="ml-2 text-gray-600 dark:text-gray-400">จดจำฉัน</span>
+        </label>
+        <button type="button" onclick="openForgotPasswordModal()" class="text-indigo-600 dark:text-indigo-400 hover:underline">ลืมรหัสผ่าน?</button>
+      </div>
+
+      <!-- Submit Button -->
+      <button 
+        type="submit" 
+        id="loginBtn" 
+        disabled 
+        class="ripple-btn w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg transition transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-indigo-600 text-sm sm:text-base"
+      >
+        <span id="btnText">เข้าสู่ระบบ</span>
+        <span id="btnSpinner" class="spinner material-symbols-outlined hidden ml-2">hourglass_empty</span>
+      </button>
+
+      <!-- Divider -->
+      <div class="relative my-6">
+        <div class="absolute inset-0 flex items-center">
+          <div class="w-full border-t border-gray-300 dark:border-gray-600"></div>
+        </div>
+        <div class="relative flex justify-center text-sm">
+          <span class="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">หรือ</span>
+        </div>
+      </div>
+
+      <!-- Google Login Button -->
+      <button 
+        type="button" 
+        id="googleLogin" 
+        class="ripple-btn w-full py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg font-medium flex items-center justify-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-600 transition text-sm sm:text-base"
+      >
+        <img src="https://www.google.com/favicon.ico" alt="Google" class="w-5 h-5">
+        <span id="googleBtnText">เข้าสู่ระบบด้วย Google</span>
+        <span id="googleSpinner" class="spinner material-symbols-outlined hidden">hourglass_empty</span>
+      </button>
+    </form>
+
+    <!-- Sign Up Link -->
+    <p class="text-center mt-6 text-gray-600 dark:text-gray-400 text-sm sm:text-base">
+      ยังไม่มีบัญชี? 
+      <a href="su.html" class="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">สมัครสมาชิก</a>
+    </p>
+
+    <!-- Back Link -->
+    <div class="text-center mt-8">
+      <a href="index.html" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-sm">← กลับไปหน้าแรก</a>
+    </div>
+  </div>
+
+  <!-- Forgot Password Modal -->
+  <div id="forgotPasswordModal" class="modal fixed inset-0 bg-black/60 flex items-center justify-center z-50 opacity-0 invisible transition-all duration-300" onclick="closeForgotPasswordModal(event)">
+    <div class="modal-content bg-white dark:bg-gray-800 max-w-[90%] w-full max-w-md rounded-2xl p-8 relative shadow-2xl transform scale-95 transition-transform duration-300" onclick="event.stopPropagation()">
+      <span class="close-btn absolute top-4 right-5 text-3xl cursor-pointer text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" onclick="closeForgotPasswordModal()">×</span>
+      
+      <!-- Step 1: Enter Email -->
+      <div id="forgotPasswordStep1">
+        <div class="text-center mb-6">
+          <span class="material-symbols-outlined text-5xl text-indigo-600 dark:text-indigo-400">key</span>
+        </div>
+        <h2 class="text-2xl font-bold mb-4 text-center text-gray-900 dark:text-white">ลืมรหัสผ่าน</h2>
+        <p class="text-gray-600 dark:text-gray-400 mb-6 text-center text-sm">กรุณากรอกอีเมลของคุณ เราจะส่งลิงค์รีเซ็ตรหัสผ่านไปยังอีเมลของคุณ</p>
+        
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">อีเมล</label>
+          <input 
+            type="email" 
+            id="forgotPasswordEmail" 
+            class="input-field w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 transition text-sm" 
+            placeholder="ตัวอย่าง: soda@example.com"
+          >
+          <p id="forgotPasswordError" class="text-red-500 text-sm mt-2" style="display: none;"></p>
+        </div>
+
+        <button id="sendResetBtn" type="button" onclick="sendPasswordReset()" class="ripple-btn w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg transition text-sm">
+          <span id="resetBtnText">ส่งลิงค์รีเซ็ตรหัสผ่าน</span>
+          <span id="resetBtnSpinner" class="spinner material-symbols-outlined hidden ml-2">hourglass_empty</span>
+        </button>
+      </div>
+
+      <!-- Step 2: Success Message -->
+      <div id="forgotPasswordStep2" style="display: none;">
+        <div class="text-center">
+          <div class="mb-6">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30">
+              <span class="material-symbols-outlined text-3xl text-green-600 dark:text-green-400">done</span>
+            </div>
+          </div>
+          <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">ส่งสำเร็จ!</h2>
+          <p class="text-gray-600 dark:text-gray-400 mb-6 text-sm">
+            เราได้ส่งลิงค์รีเซ็ตรหัสผ่านไปยังอีเมลของคุณ<br>
+            <strong id="successEmail" class="text-gray-900 dark:text-white"></strong>
+          </p>
+          <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+            <p class="text-gray-700 dark:text-gray-300 text-sm">
+              📧 <strong>กรุณาดูข้อความในอีเมล</strong><br>
+              <span class="text-gray-600 dark:text-gray-400">ลิงค์นี้จะหมดอายุในอีก 1 ชั่วโมง</span>
+            </p>
+          </div>
+          <button type="button" onclick="closeForgotPasswordModal()" class="ripple-btn w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg transition text-sm">
+            ตกลง
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { 
+      getAuth, 
+      signInWithEmailAndPassword, 
+      GoogleAuthProvider, 
+      signInWithPopup,
+      setPersistence,
+      browserLocalPersistence,
+      sendPasswordResetEmail
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      setDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAUMhtE1uw9vj7yzMKIZ_w769CrUDwEoww",
+      authDomain: "paiteaw-web.firebaseapp.com",
+      projectId: "paiteaw-web",
+      storageBucket: "paiteaw-web.firebasestorage.app",
+      messagingSenderId: "176353291629",
+      appId: "1:176353291629:web:de680e1dcc07b8a1c6be64",
+      measurementId: "G-ZP0W1EPL62"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // ============ Dark Mode ============
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+
+    function setTheme(isDark) {
+      document.documentElement.classList.toggle('dark', isDark);
+      themeIcon.textContent = isDark ? 'light_mode' : 'dark_mode';
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    }
+
+    if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      setTheme(true);
+    } else {
+      setTheme(false);
+    }
+
+    themeToggle.addEventListener('click', () => setTheme(!document.documentElement.classList.contains('dark')));
+
+    // ============ Background Slider ============
+    const backgrounds = document.querySelectorAll('.bg-slider');
+    let currentIndex = 0;
+    
+    function showNextBackground() {
+      backgrounds[currentIndex].classList.remove('active');
+      currentIndex = (currentIndex + 1) % backgrounds.length;
+      backgrounds[currentIndex].classList.add('active');
+    }
+    
+    setInterval(showNextBackground, 5000);
+
+    // ============ Toggle Password ============
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+
+    togglePassword.addEventListener('click', () => {
+      const type = passwordInput.type === 'password' ? 'text' : 'password';
+      passwordInput.type = type;
+      togglePassword.textContent = type === 'password' ? 'visibility' : 'visibility_off';
+    });
+
+    // ============ Form Validation ============
+    const loginForm = document.getElementById('loginForm');
+    const loginBtn = document.getElementById('loginBtn');
+    const email = document.getElementById('email');
+    const password = document.getElementById('password');
+    const emailError = document.getElementById('emailError');
+    const passwordError = document.getElementById('passwordError');
+    const rememberMe = document.getElementById('rememberMe');
+
+    function validateLoginForm() {
+      let isValid = true;
+
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email.value.trim() || !emailPattern.test(email.value)) {
+        emailError.style.display = 'block';
+        email.classList.add('error');
+        isValid = false;
+      } else {
+        emailError.style.display = 'none';
+        email.classList.remove('error');
+      }
+
+      if (!password.value || password.value.length < 6) {
+        passwordError.style.display = 'block';
+        password.classList.add('error');
+        isValid = false;
+      } else {
+        passwordError.style.display = 'none';
+        password.classList.remove('error');
+      }
+
+      loginBtn.disabled = !isValid;
+      return isValid;
+    }
+
+    email.addEventListener('input', validateLoginForm);
+    password.addEventListener('input', validateLoginForm);
+    validateLoginForm();
+
+    // ============ Login with Email/Password ============
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (loginBtn.disabled) return;
+
+      const emailValue = email.value.trim();
+      
+      const btnText = document.getElementById('btnText');
+      const btnSpinner = document.getElementById('btnSpinner');
+
+      try {
+        loginBtn.disabled = true;
+        btnText.textContent = 'กำลังเข้าสู่ระบบ...';
+        btnSpinner.classList.remove('hidden');
+
+        const csrfToken = window.csrfTokenManager.getToken();
+        
+        if (rememberMe.checked) {
+          await setPersistence(auth, browserLocalPersistence);
+        }
+
+        await signInWithEmailAndPassword(auth, emailValue, password.value);
+        
+        window.notificationManager.success('เข้าสู่ระบบสำเร็จ!', 3000);
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 1500);
+      } catch (error) {
+        loginBtn.disabled = false;
+        btnText.textContent = 'เข้าสู่ระบบ';
+        btnSpinner.classList.add('hidden');
+
+        let errorMessage = 'เข้าสู่ระบบล้มเหลว';
+        
+        if (error.code === 'auth/user-not-found') {
+          errorMessage = 'ไม่พบบัญชีผู้ใช้นี้ในระบบ';
+        } else if (error.code === 'auth/wrong-password') {
+          errorMessage = 'รหัสผ่านไม่ถูกต้อง';
+        } else if (error.code === 'auth/invalid-email') {
+          errorMessage = 'รูปแบบอีเมลไม่ถูกต้อง';
+        } else if (error.code === 'auth/too-many-requests') {
+          errorMessage = 'ลองเข้าสู่ระบบหลายครั้งเกินไป กรุณารอสักครู่';
+        } else if (error.code === 'auth/network-request-failed') {
+          errorMessage = 'เกิดปัญหาการเชื่อมต่อ กรุณาลองใหม่';
+        }
+
+        window.notificationManager.error(errorMessage, 5000);
+        console.error('Login error:', error);
+      }
+    });
+
+    // ============ Forgot Password Modal ============
+    window.openForgotPasswordModal = function() {
+      document.getElementById('forgotPasswordModal').classList.add('show');
+      document.getElementById('forgotPasswordStep1').style.display = 'block';
+      document.getElementById('forgotPasswordStep2').style.display = 'none';
+      document.getElementById('forgotPasswordEmail').value = '';
+      document.getElementById('forgotPasswordError').style.display = 'none';
+      document.body.style.overflow = 'hidden';
+    };
+
+    window.closeForgotPasswordModal = function(e) {
+      if (!e || e.target.id === 'forgotPasswordModal' || e.target.classList.contains('close-btn')) {
+        document.getElementById('forgotPasswordModal').classList.remove('show');
+        document.body.style.overflow = '';
+      }
+    };
+
+    window.sendPasswordReset = async function() {
+      const emailInput = document.getElementById('forgotPasswordEmail');
+      const errorDiv = document.getElementById('forgotPasswordError');
+      const btnText = document.getElementById('resetBtnText');
+      const btnSpinner = document.getElementById('resetBtnSpinner');
+      const sendBtn = document.getElementById('sendResetBtn');
+
+      const emailValue = emailInput.value.trim();
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!emailValue || !emailPattern.test(emailValue)) {
+        errorDiv.textContent = 'กรุณากรอกอีเมลให้ถูกต้อง';
+        errorDiv.style.display = 'block';
+        return;
+      }
+
+      try {
+        errorDiv.style.display = 'none';
+        sendBtn.disabled = true;
+        btnText.textContent = 'กำลังส่ง...';
+        btnSpinner.classList.remove('hidden');
+
+        await sendPasswordResetEmail(auth, emailValue);
+
+        // Show success message
+        document.getElementById('forgotPasswordStep1').style.display = 'none';
+        document.getElementById('forgotPasswordStep2').style.display = 'block';
+        document.getElementById('successEmail').textContent = emailValue;
+
+        window.notificationManager.success('ลิงค์รีเซ็ตรหัสผ่านถูกส่งแล้ว!', 4000);
+      } catch (error) {
+        sendBtn.disabled = false;
+        btnText.textContent = 'ส่งลิงค์รีเซ็ตรหัสผ่าน';
+        btnSpinner.classList.add('hidden');
+
+        let errorMessage = 'ไม่สามารถส่งลิงค์รีเซ็ตได้';
+
+        if (error.code === 'auth/user-not-found') {
+          errorMessage = 'ไม่พบบัญชีผู้ใช้ที่มีอีเมลนี้';
+        } else if (error.code === 'auth/invalid-email') {
+          errorMessage = 'รูปแบบอีเมลไม่ถูกต้อง';
+        } else if (error.code === 'auth/too-many-requests') {
+          errorMessage = 'ลองส่งหลายครั้งเกินไป กรุณารอสักครู่';
+        }
+
+        errorDiv.textContent = errorMessage;
+        errorDiv.style.display = 'block';
+        console.error('Password reset error:', error);
+      }
+    };
+
+    // ============ Google Login ============
+    document.getElementById('googleLogin').addEventListener('click', async () => {
+      const googleBtnText = document.getElementById('googleBtnText');
+      const googleSpinner = document.getElementById('googleSpinner');
+
+      try {
+        const provider = new GoogleAuthProvider();
+        googleBtnText.textContent = 'กำลังเข้าสู่ระบบ...';
+        googleSpinner.classList.remove('hidden');
+
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+
+        // บันทึก user ใน Firestore ถ้ายังไม่มี
+        const userDocRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userDocRef);
+
+        if (!userDoc.exists()) {
+          await setDoc(userDocRef, {
+            uid: user.uid,
+            email: user.email,
+            username: user.displayName || "Google User",
+            photoURL: user.photoURL || null,
+            createdAt: new Date(),
+            provider: "google"
+          });
+        }
+
+        window.notificationManager?.success?.('เข้าสู่ระบบด้วย Google สำเร็จ!', 2000);
+        // Redirect ไป dashboard.html
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 500);
+      } catch (error) {
+        googleBtnText.textContent = 'เข้าสู่ระบบด้วย Google';
+        googleSpinner.classList.add('hidden');
+
+        let errorMessage = 'Google Login ล้มเหลว';
+        
+        if (error.code === 'auth/popup-blocked') {
+          errorMessage = 'ป๊อปอัพถูกบล็อก กรุณาอนุญาตให้แสดงป๊อปอัพ';
+        } else if (error.code === 'auth/network-request-failed') {
+          errorMessage = 'เกิดปัญหาการเชื่อมต่อ กรุณาลองใหม่';
+        } else if (error.code === 'auth/cancelled-popup-request') {
+          return;
+        }
+
+        window.notificationManager.error(errorMessage, 5000);
+        console.error('Google login error:', error);
+      }
+    });
+
+    // Initialize CSRF token
+    window.addEventListener('load', () => {
+      window.csrfTokenManager.getToken();
+    });
+  </script>
+</body>
+</html>

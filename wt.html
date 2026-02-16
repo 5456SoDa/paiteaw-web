@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html class="dark" lang="th">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>พยากรณ์อากาศ - จัดการเวลาเที่ยว-ค่าใช้จ่าย</title>
+    <meta name="description" content="ตรวจสอบสภาพอากาศและคุณภาพอากาศ (AQI) ทั่วประเทศไทย พร้อมคำแนะนำจาก AI"/>
+    <meta name="keywords" content="พยากรณ์อากาศ, AQI, คุณภาพอากาศ, PM2.5, ประเทศไทย"/>
+    <meta name="author" content="จัดการเวลาเที่ยว-ค่าใช้จ่าย"/>
+    <meta name="robots" content="index, follow"/>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link rel="preconnect" href="https://cdn.tailwindcss.com"/>
+    <link rel="preconnect" href="https://www.gstatic.com"/>
+    
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#6366f1",
+                        "background-light": "#f8fafc",
+                        "background-dark": "#020617",
+                    },
+                    fontFamily: {
+                        sans: ["Kanit", "Inter", "sans-serif"],
+                        display: ["Outfit", "Kanit", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "1.25rem",
+                    },
+                    animation: {
+                        'modal-fade': 'modalFade 0.3s ease-out',
+                        'modal-scale': 'modalScale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                        'ripple': 'ripple 0.6s ease-out',
+                        'button-scale': 'buttonScale 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                        'theme-rotate': 'themeRotate 0.6s ease-in-out',
+                    },
+                    keyframes: {
+                        modalFade: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        modalScale: {
+                            '0%': { opacity: '0', transform: 'scale(0.9) translateY(-20px)' },
+                            '100%': { opacity: '1', transform: 'scale(1) translateY(0)' },
+                        },
+                        ripple: {
+                            '0%': { transform: 'scale(0)', opacity: '1' },
+                            '100%': { transform: 'scale(4)', opacity: '0' },
+                        },
+                        buttonScale: {
+                            '0%': { transform: 'scale(1)' },
+                            '100%': { transform: 'scale(1.05)' },
+                        },
+                        themeRotate: {
+                            '0%': { transform: 'rotate(0deg) scale(1)' },
+                            '50%': { transform: 'rotate(90deg) scale(1.1)' },
+                            '100%': { transform: 'rotate(180deg) scale(1)' },
+                        },
+                    },
+                },
+            },
+        };
+    </script>
+    <style type="text/tailwindcss">
+        /* ============================================ */
+        /* MATERIAL ICONS */
+        /* ============================================ */
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        /* ============================================ */
+        /* NEON GLOW */
+        /* ============================================ */
+        .neon-glow {
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+        }
+        .dark .neon-glow {
+            box-shadow: 0 0 25px rgba(99, 102, 241, 0.6);
+        }
+        .logo-neon {
+            filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.8));
+        }
+
+        /* ============================================ */
+        /* PAGE TRANSITIONS */
+        /* ============================================ */
+        .page-transition {
+            animation: pageTransition 0.4s ease-out;
+        }
+        @keyframes pageTransition {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ============================================ */
+        /* MODAL ANIMATIONS */
+        /* ============================================ */
+        .modal-overlay {
+            animation: modalFade 0.3s ease-out forwards;
+            transition: background-color 0.3s ease-in-out;
+        }
+        .modal-overlay.closing {
+            animation: modalFade 0.3s ease-out reverse forwards;
+        }
+        .modal-content {
+            animation: modalScale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        .modal-overlay.closing .modal-content {
+            animation: modalScale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) reverse forwards;
+        }
+
+        /* ============================================ */
+        /* RIPPLE EFFECT BUTTONS */
+        /* ============================================ */
+        .ripple-button {
+            position: relative;
+            overflow: hidden;
+        }
+        .ripple-button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            opacity: 0;
+        }
+        .ripple-button:active::after {
+            animation: ripple 0.6s ease-out;
+        }
+
+        /* ============================================ */
+        /* SCALE BUTTONS (CTA) */
+        /* ============================================ */
+        .scale-button {
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        box-shadow 0.3s ease-in-out;
+        }
+        .scale-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 16px rgba(99, 102, 241, 0.2);
+        }
+        .scale-button:active {
+            transform: scale(0.98);
+        }
+        .scale-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: scale(1);
+        }
+
+        /* ============================================ */
+        /* THEME TOGGLE ANIMATION */
+        /* ============================================ */
+        .theme-icon {
+            display: inline-block;
+            transition: transform 0.6s ease-in-out;
+        }
+        .theme-icon.rotating {
+            animation: themeRotate 0.6s ease-in-out;
+        }
+        .theme-toggle {
+            transition: background-color 0.3s ease-in-out,
+                        color 0.3s ease-in-out;
+        }
+
+        /* ============================================ */
+        /* SMOOTH COLOR TRANSITIONS */
+        /* ============================================ */
+        body {
+            transition: background-color 0.3s ease-in-out, 
+                        color 0.3s ease-in-out;
+        }
+
+        /* ============================================ */
+        /* OTHER ANIMATIONS */
+        /* ============================================ */
+        .dropdown-menu {
+            transform-origin: top right;
+            animation: dropdownIn 0.2s ease-out;
+        }
+        @keyframes dropdownIn {
+            0% { opacity: 0; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .loader {
+            border: 3px solid rgba(255,255,255,0.1);
+            border-left-color: #6366f1;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
+        .ai-content ul { list-style-type: disc; margin-left: 1.5rem; margin-top: 0.5rem; }
+        .ai-content li { margin-bottom: 0.25rem; }
+        .ai-content strong { color: #6366f1; font-weight: 600; }
+        select option {
+            background-color: #1e293b;
+            color: white;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #6366f1;
+            border-radius: 4px;
+            transition: background 0.3s ease-in-out;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #818cf8;
+        }
+        .skeleton {
+            background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        .hourly-scroll {
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+        }
+        .hourly-scroll::-webkit-scrollbar {
+            display: none;
+        }
+        .tab-active {
+            border-bottom-color: #6366f1;
+            color: #6366f1;
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .slide-in {
+            animation: slideIn 0.4s ease-out;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* ============================================ */
+        /* ACCESSIBILITY */
+        /* ============================================ */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300 page-transition min-h-screen">
+    
+    <!-- Loading Overlay -->
+    <div id="pageLoader" class="fixed inset-0 z-[100] bg-background-light dark:bg-background-dark flex items-center justify-center transition-opacity duration-300">
+        <div class="flex flex-col items-center">
+            <div class="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+            <p class="text-slate-500 dark:text-slate-400 text-sm">กำลังโหลด...</p>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="fixed top-0 w-full z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <a href="dashboard.html" class="p-2.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+                    <span class="material-symbols-outlined text-slate-600 dark:text-slate-300">arrow_back</span>
+                </a>
+                <div>
+                    <img src="https://i.postimg.cc/d3Jnyv2F/11zon-cropped.png" alt="Logo" class="w-10 h-10 rounded-full">
+                </div>
+                <span class="font-display text-2xl font-extrabold tracking-tight hidden sm:block">จัดการเวลาเที่ยว-ค่าใช้จ่าย</span>
+            </div>
+            
+            <div class="flex items-center">
+                <button class="p-2.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors group scale-button ripple-button theme-toggle" onclick="toggleDarkMode()" aria-label="เปลี่ยนโหมดการแสดงผล" title="เปลี่ยนโหมดการแสดงผล">
+                    <span class="material-symbols-outlined text-slate-600 dark:text-yellow-400 group-hover:text-primary theme-icon" id="theme-icon">light_mode</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Account Modal -->
+    <div id="accountModal" class="fixed inset-0 z-[60] hidden modal-overlay">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeAccountModal()"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-6">
+            <div class="modal-content bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-display font-bold">ตั้งค่าบัญชี</h3>
+                    <button onclick="closeAccountModal()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                
+                <div class="space-y-6">
+                    <div class="text-center">
+                        <div class="relative inline-block">
+                            <img id="modalProfileImage" src="" alt="Profile" class="w-24 h-24 rounded-full object-cover bg-slate-200 dark:bg-slate-700 mx-auto hidden"/>
+                            <div id="modalProfilePlaceholder" class="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                                <span class="material-symbols-outlined text-primary text-3xl">person</span>
+                            </div>
+                            <button onclick="document.getElementById('modalProfileImageInput').click()" class="absolute bottom-0 right-0 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center shadow-lg hover:bg-indigo-600 transition-colors">
+                                <span class="material-symbols-outlined text-sm">edit</span>
+                            </button>
+                        </div>
+                        <input type="file" id="modalProfileImageInput" accept="image/*" class="hidden" onchange="handleModalProfileImageUpload(event)"/>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-3">คลิกที่รูปเพื่อเปลี่ยนรูปโปรไฟล์</p>
+                    </div>
+                    
+                    <div class="border-t border-slate-200 dark:border-slate-700 pt-6">
+                        <h4 class="font-semibold mb-4 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-slate-400">lock</span>
+                            เปลี่ยนรหัสผ่าน
+                        </h4>
+                        <form id="changePasswordForm" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">รหัสผ่านปัจจุบัน</label>
+                                <input type="password" id="currentPassword" required
+                                    class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                                    placeholder="••••••••">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">รหัสผ่านใหม่</label>
+                                <input type="password" id="newPassword" required minlength="6"
+                                    class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                                    placeholder="••••••••">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">ยืนยันรหัสผ่านใหม่</label>
+                                <input type="password" id="confirmNewPassword" required
+                                    class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                                    placeholder="••••••••">
+                            </div>
+                            <button type="submit"
+                                class="w-full py-3 bg-primary hover:bg-indigo-600 text-white font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-2">
+                                <span class="material-symbols-outlined">lock_reset</span>
+                                เปลี่ยนรหัสผ่าน
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Compare Modal -->
+    <div id="compareModal" class="fixed inset-0 z-[60] hidden">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeCompareModal()"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-6">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-display font-bold">เปรียบเทียบเมืองสองจังหวัด</h3>
+                    <button onclick="closeCompareModal()" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">จังหวัดที่ 1</label>
+                        <select id="compareCity1" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                            <option value="" selected disabled>-- เลือกจังหวัด --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">จังหวัดที่ 2</label>
+                        <select id="compareCity2" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                            <option value="" selected disabled>-- เลือกจังหวัด --</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button onclick="executeCompare()" class="w-full py-3 bg-primary hover:bg-indigo-600 text-white font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">compare</span>
+                    เปรียบเทียบ
+                </button>
+                
+                <div id="compareResults" class="mt-6 hidden">
+                    <div class="grid grid-cols-1 gap-6">
+                        <div id="compareCity1Result" class="bg-slate-50 dark:bg-slate-800/30 rounded-2xl p-6"></div>
+                        <div id="compareCity2Result" class="bg-slate-50 dark:bg-slate-800/30 rounded-2xl p-6"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="pt-28 pb-12 px-6 max-w-7xl mx-auto">
+        <!-- Page Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-display font-bold mb-2">พยากรณ์อากาศและคุณภาพอากาศ</h1>
+            <p class="text-slate-500 dark:text-slate-400">ตรวจสอบสภาพอากาศอย่างละเอียดสำหรับการวางแผนเที่ยว</p>
+        </div>
+
+        <!-- Controls Bar -->
+        <div class="mb-6 flex gap-4 flex-wrap">
+            <div class="flex-1 min-w-[200px]">
+                <div class="relative">
+                    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary">location_on</span>
+                    <select id="provinceSelect" onchange="handleProvinceChange()" 
+                        class="w-full pl-12 pr-10 py-4 bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-900 dark:text-slate-100 appearance-none outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer font-medium">
+                        <option value="" disabled selected>-- เลือกจังหวัด --</option>
+                    </select>
+                </div>
+            </div>
+            <button onclick="openCompareModal()" class="px-6 py-4 bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-2 font-medium">
+                <span class="material-symbols-outlined">compare</span>
+                <span class="hidden sm:block">เปรียบเทียบ</span>
+            </button>
+        </div>
+
+        <!-- Main Weather Card -->
+        <div class="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-xl relative overflow-hidden fade-in">
+            
+            <!-- Loading Overlay -->
+            <div id="mainLoader" class="absolute inset-0 bg-background-dark/80 backdrop-blur-sm z-20 flex flex-col items-center justify-center hidden">
+                <div class="loader w-10 h-10 border-4 mb-3"></div>
+                <p class="text-white/60 text-sm font-medium animate-pulse">กำลังโหลดข้อมูล...</p>
+            </div>
+
+            <!-- Welcome State -->
+            <div id="welcomeState" class="py-16 text-center">
+                <div class="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <span class="material-symbols-outlined text-4xl text-slate-400">cloud_queue</span>
+                </div>
+                <p class="text-slate-500 dark:text-slate-400 font-medium text-lg">กรุณาเลือกจังหวัดเพื่อดูสภาพอากาศ</p>
+                <p class="text-slate-400 text-sm mt-2">เลือกจังหวัดจากเมนูด้านบนเพื่อเริ่มต้น</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="errorState" class="hidden py-16 text-center">
+                <div class="w-20 h-20 bg-red-100 dark:bg-red-900/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <span class="material-symbols-outlined text-4xl text-red-500">error_outline</span>
+                </div>
+                <p class="text-slate-500 dark:text-slate-400 font-medium text-lg">ไม่พบข้อมูล</p>
+                <p id="errorMsg" class="text-sm text-red-500 mt-2"></p>
+            </div>
+
+            <!-- Weather Content -->
+            <div id="weatherContent" class="hidden">
+                <!-- Current Weather Section -->
+                <div class="text-center mb-10">
+                    <div class="mb-4 flex justify-center">
+                        <img id="weatherIcon" src="" alt="weather" class="w-32 h-32 object-contain drop-shadow-lg">
+                    </div>
+                    <h2 id="cityName" class="text-3xl font-bold mb-1">-</h2>
+                    <p id="weatherText" class="text-slate-500 dark:text-slate-400 mb-4 text-lg">-</p>
+                    <div class="flex items-start justify-center">
+                        <span id="temp" class="text-7xl font-light tracking-tighter">0</span>
+                        <span class="text-3xl mt-2 text-slate-400">°C</span>
+                    </div>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">รู้สึกเหมือน <span id="feelsLike">0</span>°C</p>
+                </div>
+
+                <!-- Tabs -->
+                <div class="border-b border-slate-200 dark:border-slate-800 mb-6 flex gap-8">
+                    <button onclick="switchTab('details')" id="tab-details" class="pb-4 font-medium border-b-2 border-primary text-primary transition-colors tab-active">
+                        รายละเอียด
+                    </button>
+                    <button onclick="switchTab('hourly')" id="tab-hourly" class="pb-4 font-medium border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition-colors">
+                        รายชั่วโมง
+                    </button>
+                    <button onclick="switchTab('forecast')" id="tab-forecast" class="pb-4 font-medium border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition-colors">
+                        7 วัน
+                    </button>
+                    <button onclick="switchTab('aqi')" id="tab-aqi" class="pb-4 font-medium border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition-colors">
+                        AQI
+                    </button>
+                </div>
+
+                <!-- Details Tab -->
+                <div id="details-tab" class="fade-in">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                        <div class="bg-slate-50 dark:bg-slate-800/30 rounded-2xl p-4 flex flex-col items-center justify-center">
+                            <div class="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center mb-2">
+                                <span class="material-symbols-outlined text-blue-500">opacity</span>
+                            </div>
+                            <p class="text-xs text-slate-400 mb-1">ความชื้น</p>
+                            <p class="text-2xl font-bold"><span id="humidity">0</span>%</p>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-800/30 rounded-2xl p-4 flex flex-col items-center justify-center">
+                            <div class="w-12 h-12 bg-orange-500/10 rounded-xl flex items-center justify-center mb-2">
+                                <span class="material-symbols-outlined text-orange-500">wb_sunny</span>
+                            </div>
+                            <p class="text-xs text-slate-400 mb-1">UV Index</p>
+                            <p id="uv" class="text-2xl font-bold">0</p>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-800/30 rounded-2xl p-4 flex flex-col items-center justify-center">
+                            <div class="w-12 h-12 bg-cyan-500/10 rounded-xl flex items-center justify-center mb-2">
+                                <span class="material-symbols-outlined text-cyan-500">air</span>
+                            </div>
+                            <p class="text-xs text-slate-400 mb-1">ลม</p>
+                            <p class="text-2xl font-bold"><span id="wind">0</span><span class="text-sm text-slate-400"> km/h</span></p>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-800/30 rounded-2xl p-4 flex flex-col items-center justify-center">
+                            <div class="w-12 h-12 bg-indigo-500/10 rounded-xl flex items-center justify-center mb-2">
+                                <span class="material-symbols-outlined text-indigo-500">visibility</span>
+                            </div>
+                            <p class="text-xs text-slate-400 mb-1">การมองเห็น</p>
+                            <p class="text-2xl font-bold"><span id="vis">0</span><span class="text-sm text-slate-400"> km</span></p>
+                        </div>
+                    </div>
+
+                    <!-- Sunrise/Sunset and Moon -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-gradient-to-br from-orange-500/10 to-yellow-500/10 dark:from-orange-500/20 dark:to-yellow-500/20 border border-orange-200 dark:border-orange-900/30 rounded-2xl p-6">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="material-symbols-outlined text-orange-500 text-2xl">sunrise</span>
+                                <span class="font-semibold">พระอาทิตย์ขึ้น</span>
+                            </div>
+                            <p id="sunriseTime" class="text-2xl font-bold">--:--</p>
+                        </div>
+                        <div class="bg-gradient-to-br from-indigo-500/10 to-purple-500/10 dark:from-indigo-500/20 dark:to-purple-500/20 border border-indigo-200 dark:border-indigo-900/30 rounded-2xl p-6">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="material-symbols-outlined text-indigo-500 text-2xl">sunset</span>
+                                <span class="font-semibold">พระอาทิตย์ตก</span>
+                            </div>
+                            <p id="sunsetTime" class="text-2xl font-bold">--:--</p>
+                        </div>
+                        <div class="bg-gradient-to-br from-slate-600/10 to-slate-800/10 dark:from-slate-600/20 dark:to-slate-800/20 border border-slate-300 dark:border-slate-700 rounded-2xl p-6">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="material-symbols-outlined text-slate-500 text-2xl">nights_stay</span>
+                                <span class="font-semibold">เฟสดวงจันทร์</span>
+                            </div>
+                            <p id="moonPhase" class="text-2xl font-bold">--</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hourly Tab -->
+                <div id="hourly-tab" class="hidden fade-in">
+                    <div class="flex gap-2 overflow-x-auto pb-2 hourly-scroll">
+                        <div id="hourlyContainer" class="flex gap-2 pb-2">
+                            <!-- Hourly cards injected here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Forecast Tab -->
+                <div id="forecast-tab" class="hidden fade-in">
+                    <div class="space-y-3" id="forecastContainer">
+                        <!-- Forecast items injected here -->
+                    </div>
+                </div>
+
+                <!-- AQI Tab -->
+                <div id="aqi-tab" class="hidden fade-in">
+                    <div class="space-y-6">
+                        <!-- AQI Status -->
+                        <div class="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/50 dark:to-slate-800/30 rounded-2xl p-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-teal-500/10 rounded-xl flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-teal-500">air</span>
+                                    </div>
+                                    <span class="font-medium text-lg">คุณภาพอากาศ</span>
+                                </div>
+                                <span id="aqiStatus" class="text-xs px-3 py-1.5 bg-slate-200 dark:bg-slate-700 rounded-full font-medium">รอข้อมูล</span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-4 text-center">
+                                <div>
+                                    <p class="text-xs text-slate-400 mb-2">PM2.5</p>
+                                    <p id="pm25" class="text-3xl font-bold text-primary">-</p>
+                                    <p class="text-xs text-slate-500 mt-1">μg/m³</p>
+                                </div>
+                                <div class="border-x border-slate-300 dark:border-slate-700">
+                                    <p class="text-xs text-slate-400 mb-2">PM10</p>
+                                    <p id="pm10" class="text-3xl font-bold text-primary">-</p>
+                                    <p class="text-xs text-slate-500 mt-1">μg/m³</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-slate-400 mb-2">EPA Index</p>
+                                    <p id="epaIndex" class="text-3xl font-bold text-primary">-</p>
+                                    <p class="text-xs text-slate-500 mt-1">/6</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- AQI Description -->
+                        <div class="bg-slate-50 dark:bg-slate-800/30 rounded-2xl p-6">
+                            <h4 class="font-semibold mb-3">ความหมาย EPA Index</h4>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+                                    <span><strong>1 - ดีมาก:</strong> เหมาะสำหรับกิจกรรมกลางแจ้ง</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                                    <span><strong>2 - ปานกลาง:</strong> คนบางกลุ่มอาจได้รับผลกระทบ</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-3 h-3 rounded-full bg-orange-500"></div>
+                                    <span><strong>3 - เริ่มมีผล:</strong> สมาชิกกลุ่มเสี่ยงควรจำกัดกิจกรรม</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                                    <span><strong>4 - มีผล:</strong> คนทั่วไปควรจำกัดกิจกรรมกลางแจ้ง</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-3 h-3 rounded-full bg-purple-500"></div>
+                                    <span><strong>5 - อันตราย:</strong> ทุกคนควรหลีกเลี่ยงกิจกรรมกลางแจ้ง</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-3 h-3 rounded-full bg-rose-600"></div>
+                                    <span><strong>6 - อันตรายมาก:</strong> อยู่ในห้องปรับอากาศ</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- AQI Chart -->
+                        <div class="bg-slate-50 dark:bg-slate-800/30 rounded-2xl p-6">
+                            <h4 class="font-semibold mb-4">กราฟ AQI (24 ชั่วโมง)</h4>
+                            <canvas id="aqiChart" style="max-height: 300px;"></canvas>
+                        </div>
+
+                        <!-- Pollutants Detail -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-900/50 rounded-2xl p-4">
+                                <p class="text-xs text-slate-500 mb-1">SO₂ (ซัลเฟอร์ไดออกไซด์)</p>
+                                <p id="so2" class="text-2xl font-bold text-blue-600">-</p>
+                                <p class="text-xs text-slate-400 mt-1">ppb</p>
+                            </div>
+                            <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-900/50 rounded-2xl p-4">
+                                <p class="text-xs text-slate-500 mb-1">NO₂ (ไนโตรเจนไดออกไซด์)</p>
+                                <p id="no2" class="text-2xl font-bold text-green-600">-</p>
+                                <p class="text-xs text-slate-400 mt-1">ppb</p>
+                            </div>
+                            <div class="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-900/50 rounded-2xl p-4">
+                                <p class="text-xs text-slate-500 mb-1">O₃ (โอโซน)</p>
+                                <p id="o3" class="text-2xl font-bold text-purple-600">-</p>
+                                <p class="text-xs text-slate-400 mt-1">ppb</p>
+                            </div>
+                            <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/50 rounded-2xl p-4">
+                                <p class="text-xs text-slate-500 mb-1">CO (คาร์บอนมอนอกไซด์)</p>
+                                <p id="co" class="text-2xl font-bold text-red-600">-</p>
+                                <p class="text-xs text-slate-400 mt-1">ppm</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Button -->
+                <div class="mt-8">
+                    <button id="aiButton" onclick="askGemini()" 
+                        class="w-full py-4 bg-gradient-to-r from-primary to-indigo-600 hover:from-indigo-600 hover:to-primary text-white font-semibold rounded-2xl transition-all duration-300 transform hover:scale-[1.02] shadow-lg shadow-primary/20 flex items-center justify-center gap-3">
+                        <span id="aiBtnIcon" class="material-symbols-outlined animate-pulse">auto_awesome</span>
+                        <span id="aiBtnText">วิเคราะห์สภาพอากาศด้วย AI</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="mt-8 text-center">
+                <p class="text-xs text-slate-400">
+                    ข้อมูลจาก WeatherAPI.com
+                </p>
+            </div>
+        </div>
+
+        <!-- AI Response Section -->
+        <div id="aiResponseContainer" class="mt-6 bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-xl hidden fade-in">
+            <div class="flex items-center gap-4 mb-6">
+                <div class="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                    <span class="material-symbols-outlined text-primary">auto_awesome</span>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg">คำแนะนำจาก AI</h3>
+                    <p id="aiTimestamp" class="text-xs text-slate-400">เพิ่งวิเคราะห์เสร็จสิ้น</p>
+                </div>
+            </div>
+            <div id="aiContent" class="text-sm leading-relaxed ai-content text-slate-600 dark:text-slate-300">
+                <!-- AI Content Injected Here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-slate-800 dark:bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 transition-all duration-300 opacity-0 translate-y-10 pointer-events-none z-[70]">
+        <span id="toastIcon" class="material-symbols-outlined">check_circle</span>
+        <span id="toastMessage" class="font-medium">Notification</span>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-slate-100 dark:bg-slate-950 py-8 border-t border-slate-200 dark:border-slate-900">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <div class="text-slate-500 dark:text-slate-400 text-sm">
+                © 2026 จัดการเวลาเที่ยว-ค่าใช้จ่าย
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ============================================
+        // SAFETY UTILITIES - ตรวจสอบ element ก่อนใช้
+        // ============================================
+        function safeGetElement(id) {
+            const el = document.getElementById(id);
+            if (!el) {
+                console.warn(`⚠️ Element #${id} ไม่พบ`);
+                return null;
+            }
+            return el;
+        }
+
+        function safeSetText(id, text) {
+            const el = safeGetElement(id);
+            if (el) el.textContent = text;
+        }
+
+        function safeSetValue(id, val) {
+            const el = safeGetElement(id);
+            if (el) el.value = val;
+        }
+
+        // ============================================
+        // FIREBASE & USER AUTHENTICATION
+        // ============================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyAUMhtE1uw9vj7yzMKIZ_w769CrUDwEoww",
+            authDomain: "paiteaw-web.firebaseapp.com",
+            projectId: "paiteaw-web",
+            storageBucket: "paiteaw-web.firebasestorage.app",
+            messagingSenderId: "176353291629",
+            appId: "1:176353291629:web:de680e1dcc07b8a1c6be64",
+            measurementId: "G-ZP0W1EPL62"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        let currentUser = null;
+        let userProfileImage = localStorage.getItem('userProfileImage') || null;
+        let favorites = JSON.parse(localStorage.getItem('weatherFavorites')) || [];
+        let currentWeatherData = null;
+        let currentForecastData = null;
+        let currentAstronomyData = null;
+        let aqiChart = null;
+
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                updateUserUI(user);
+                loadProvinceSelect();
+                hidePageLoader();
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+
+        function hidePageLoader() {
+            const loader = document.getElementById('pageLoader');
+            loader.style.opacity = '0';
+            setTimeout(() => loader.classList.add('hidden'), 300);
+        }
+
+        function updateUserUI(user) {
+            // Elements ที่ลบไปแล้ว (profile menu) - skip
+            // updateProfileImages() ยังใช้ได้ เพราะมี account modal
+            updateProfileImages();
+        }
+
+        function updateProfileImages() {
+            const profileImage = document.getElementById('profileImage');
+            const profilePlaceholder = document.getElementById('profilePlaceholder');
+            const modalProfileImage = document.getElementById('modalProfileImage');
+            const modalProfilePlaceholder = document.getElementById('modalProfilePlaceholder');
+            
+            // Skip ถ้า elements เหล่านี้ไม่มี (profile menu ถูกลบแล้ว)
+            if (!profileImage || !modalProfileImage) return;
+            
+            if (userProfileImage) {
+                profileImage.src = userProfileImage;
+                profileImage.classList.remove('hidden');
+                if (profilePlaceholder) profilePlaceholder.classList.add('hidden');
+                
+                modalProfileImage.src = userProfileImage;
+                modalProfileImage.classList.remove('hidden');
+                if (modalProfilePlaceholder) modalProfilePlaceholder.classList.add('hidden');
+            } else if (currentUser?.photoURL) {
+                profileImage.src = currentUser.photoURL;
+                profileImage.classList.remove('hidden');
+                if (profilePlaceholder) profilePlaceholder.classList.add('hidden');
+                
+                modalProfileImage.src = currentUser.photoURL;
+                modalProfileImage.classList.remove('hidden');
+                if (modalProfilePlaceholder) modalProfilePlaceholder.classList.add('hidden');
+            }
+        }
+
+        function handleModalProfileImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                resizeImage(file, 200, 200, (resizedImage) => {
+                    userProfileImage = resizedImage;
+                    localStorage.setItem('userProfileImage', resizedImage);
+                    updateProfileImages();
+                    showToast('อัปเดตรูปโปรไฟล์สำเร็จ', 'success');
+                });
+            }
+        }
+
+        function resizeImage(file, maxWidth, maxHeight, callback) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    if (width > height) {
+                        if (width > maxWidth) {
+                            height *= maxWidth / width;
+                            width = maxWidth;
+                        }
+                    } else {
+                        if (height > maxHeight) {
+                            width *= maxHeight / height;
+                            height = maxHeight;
+                        }
+                    }
+                    
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    callback(canvas.toDataURL('image/jpeg', 0.8));
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function openAccountModal() {
+            const modal = document.getElementById('accountModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('modal-overlay');
+        }
+
+        function closeAccountModal() {
+            const modal = document.getElementById('accountModal');
+            modal.classList.add('closing');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('closing', 'modal-overlay');
+            }, 300);
+        }
+
+        // Change Password Form - with safety check
+        const changePasswordForm = safeGetElement('changePasswordForm');
+        if (changePasswordForm) {
+            changePasswordForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const currentPassword = safeGetElement('currentPassword')?.value || '';
+                const newPassword = safeGetElement('newPassword')?.value || '';
+                const confirmNewPassword = safeGetElement('confirmNewPassword')?.value || '';
+                
+                if (newPassword !== confirmNewPassword) {
+                    showToast('รหัสผ่านใหม่ไม่ตรงกัน', 'error');
+                    return;
+                }
+                
+                try {
+                    const credential = firebase.auth.EmailAuthProvider.credential(currentUser.email, currentPassword);
+                    await currentUser.reauthenticateWithCredential(credential);
+                    await currentUser.updatePassword(newPassword);
+                    showToast('เปลี่ยนรหัสผ่านสำเร็จ', 'success');
+                    changePasswordForm.reset();
+                    closeAccountModal();
+                } catch (error) {
+                    let message = 'เกิดข้อผิดพลาด';
+                    if (error.code === 'auth/wrong-password') message = 'รหัสผ่านปัจจุบันไม่ถูกต้อง';
+                    showToast(message, 'error');
+                }
+            });
+        }
+
+        function logout() {
+            auth.signOut().then(() => {
+                window.location.href = 'login.html';
+            }).catch(() => {
+                showToast('เกิดข้อผิดพลาดในการออกจากระบบ', 'error');
+            });
+        }
+
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const icon = document.getElementById('theme-icon');
+            
+            // Add rotating animation
+            icon.classList.add('rotating');
+            
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                icon.innerText = 'dark_mode';
+                localStorage.theme = 'light';
+            } else {
+                html.classList.add('dark');
+                icon.innerText = 'light_mode';
+                localStorage.theme = 'dark';
+            }
+            
+            // Remove animation class after it completes
+            setTimeout(() => {
+                icon.classList.remove('rotating');
+            }, 600);
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = safeGetElement('toast');
+            const toastIcon = safeGetElement('toastIcon');
+            const toastMessage = safeGetElement('toastMessage');
+            
+            if (!toast || !toastIcon || !toastMessage) {
+                console.error('Toast elements not found');
+                return;
+            }
+            
+            toastMessage.textContent = message;
+            const icons = { success: 'check_circle', error: 'error', info: 'info' };
+            toastIcon.textContent = icons[type] || 'info';
+            
+            toast.classList.remove('opacity-0', 'translate-y-10');
+            setTimeout(() => toast.classList.add('opacity-0', 'translate-y-10'), 3000);
+        }
+
+        // ============================================
+        // WEATHER API & DATA FETCHING
+        // ============================================
+        const weatherApiKey = "6510262fa8874b12832131524261502";
+        const geminiApiKey = "AIzaSyAeHrRVDqYlWERtVczjg6XIgFuPLZyw2LE";
+
+        const provincesList = [
+            { en: "Bangkok", th: "กรุงเทพมหานคร" }, { en: "Krabi", th: "กระบี่" }, { en: "Kanchanaburi", th: "กาญจนบุรี" },
+            { en: "Kalasin", th: "กาฬสินธุ์" }, { en: "Kamphaeng Phet", th: "กำแพงเพชร" }, { en: "Khon Kaen", th: "ขอนแก่น" },
+            { en: "Chanthaburi", th: "จันทบุรี" }, { en: "Chachoengsao", th: "ฉะเชิงเทรา" }, { en: "Chon Buri", th: "ชลบุรี" },
+            { en: "Chai Nat", th: "ชัยนาท" }, { en: "Chaiyaphum", th: "ชัยภูมิ" }, { en: "Chumphon", th: "ชุมพร" },
+            { en: "Chiang Rai", th: "เชียงราย" }, { en: "Chiang Mai", th: "เชียงใหม่" }, { en: "Trang", th: "ตรัง" },
+            { en: "Trat", th: "ตราด" }, { en: "Tak", th: "ตาก" }, { en: "Nakhon Nayok", th: "นครนายก" },
+            { en: "Nakhon Pathom", th: "นครปฐม" }, { en: "Nakhon Phanom", th: "นครพนม" },
+            { en: "Nakhon Ratchasima", th: "นครราชสีมา" }, { en: "Nakhon Si Thammarat", th: "นครศรีธรรมราช" },
+            { en: "Nakhon Sawan", th: "นครสวรรค์" }, { en: "Nonthaburi", th: "นนทบุรี" }, { en: "Narathiwat", th: "นราธิวาส" },
+            { en: "Nan", th: "น่าน" }, { en: "Bueng Kan", th: "บึงกาฬ" }, { en: "Buriram", th: "บุรีรัมย์" },
+            { en: "Pathum Thani", th: "ปทุมธานี" }, { en: "Prachuap Khiri Khan", th: "ประจวบคีรีขันธ์" },
+            { en: "Prachinburi", th: "ปราจีนบุรี" }, { en: "Pattani", th: "ปัตตานี" },
+            { en: "Phra Nakhon Si Ayutthaya", th: "พระนครศรีอยุธยา" }, { en: "Phayao", th: "พะเยา" },
+            { en: "Phang Nga", th: "พังงา" }, { en: "Phatthalung", th: "พัทลุง" }, { en: "Phichit", th: "พิจิตร" },
+            { en: "Phitsanulok", th: "พิษณุโลก" }, { en: "Phetchaburi", th: "เพชรบุรี" }, { en: "Phetchabun", th: "เพชรบูรณ์" },
+            { en: "Phrae", th: "แพร่" }, { en: "Phuket", th: "ภูเก็ต" }, { en: "Maha Sarakham", th: "มหาสารคาม" },
+            { en: "Mukdahan", th: "มุกดาหาร" }, { en: "Mae Hong Son", th: "แม่ฮ่องสอน" }, { en: "Yasothon", th: "ยโสธร" },
+            { en: "Yala", th: "ยะลา" }, { en: "Roi Et", th: "ร้อยเอ็ด" }, { en: "Ranong", th: "ระนอง" },
+            { en: "Rayong", th: "ระยอง" }, { en: "Ratchaburi", th: "ราชบุรี" }, { en: "Lopburi", th: "ลพบุรี" },
+            { en: "Lampang", th: "ลำปาง" }, { en: "Lamphun", th: "ลำพูน" }, { en: "Loei", th: "เลย" },
+            { en: "Sisaket", th: "ศรีสะเกษ" }, { en: "Sakon Nakhon", th: "สกลนคร" }, { en: "Songkhla", th: "สงขลา" },
+            { en: "Satun", th: "สตูล" }, { en: "Samut Prakan", th: "สมุทรปราการ" }, { en: "Samut Songkhram", th: "สมุทรสงคราม" },
+            { en: "Samut Sakhon", th: "สมุทรสาคร" }, { en: "Sa Kaeo", th: "สระแก้ว" }, { en: "Saraburi", th: "สระบุรี" },
+            { en: "Sing Buri", th: "สิงห์บุรี" }, { en: "Sukhothai", th: "สุโขทัย" }, { en: "Suphan Buri", th: "สุพรรณบุรี" },
+            { en: "Surat Thani", th: "สุราษฎร์ธานี" }, { en: "Surin", th: "สุรินทร์" }, { en: "Nong Khai", th: "หนองคาย" },
+            { en: "Nong Bua Lamphu", th: "หนองบัวลำภู" }, { en: "Ang Thong", th: "อ่างทอง" },
+            { en: "Amnat Charoen", th: "อำนาจเจริญ" }, { en: "Udon Thani", th: "อุดรธานี" },
+            { en: "Uttaradit", th: "อุตรดิตถ์" }, { en: "Uthai Thani", th: "อุทัยธานี" },
+            { en: "Ubon Ratchathani", th: "อุบลราชธานี" }
+        ];
+
+        function loadProvinceSelect() {
+            const select = document.getElementById('provinceSelect');
+            const compareSelect1 = document.getElementById('compareCity1');
+            const compareSelect2 = document.getElementById('compareCity2');
+            
+            provincesList.forEach(prov => {
+                const option1 = document.createElement('option');
+                option1.value = prov.en;
+                option1.textContent = prov.th;
+                select.appendChild(option1);
+                
+                const option2 = document.createElement('option');
+                option2.value = prov.en;
+                option2.textContent = prov.th;
+                compareSelect1.appendChild(option2);
+                
+                const option3 = document.createElement('option');
+                option3.value = prov.en;
+                option3.textContent = prov.th;
+                compareSelect2.appendChild(option3);
+            });
+        }
+
+        function handleProvinceChange() {
+            const val = document.getElementById('provinceSelect').value;
+            if (val) fetchAllWeatherData(val);
+        }
+
+        async function fetchAllWeatherData(query) {
+            showMainLoader(true);
+            document.getElementById('aiResponseContainer').classList.add('hidden');
+            
+            try {
+                const currentUrl = `https://api.weatherapi.com/v1/current.json?key=${weatherApiKey}&q=${query}&aqi=yes&lang=th`;
+                const forecastUrl = `https://api.weatherapi.com/v1/forecast.json?key=${weatherApiKey}&q=${query}&days=10&aqi=yes&alerts=yes&lang=th`;
+                const astronomyUrl = `https://api.weatherapi.com/v1/astronomy.json?key=${weatherApiKey}&q=${query}&lang=th`;
+                
+                const [currentRes, forecastRes, astronomyRes] = await Promise.all([
+                    fetch(currentUrl),
+                    fetch(forecastUrl),
+                    fetch(astronomyUrl)
+                ]);
+                
+                if (!currentRes.ok || !forecastRes.ok || !astronomyRes.ok) {
+                    throw new Error("ไม่พบข้อมูล");
+                }
+                
+                currentWeatherData = await currentRes.json();
+                currentForecastData = await forecastRes.json();
+                currentAstronomyData = await astronomyRes.json();
+                
+                updateUI(currentWeatherData);
+                
+                document.getElementById('welcomeState').classList.add('hidden');
+                document.getElementById('errorState').classList.add('hidden');
+                document.getElementById('weatherContent').classList.remove('hidden');
+                
+            } catch (err) {
+                console.error(err);
+                showError("ไม่พบข้อมูล หรือการเชื่อมต่อมีปัญหา");
+            } finally {
+                showMainLoader(false);
+            }
+        }
+
+        function updateUI(data) {
+            const c = data.current;
+            const l = data.location;
+            const aqi = c.air_quality;
+            
+            const foundProv = provincesList.find(p => p.en.toLowerCase() === l.name.toLowerCase());
+            document.getElementById('cityName').textContent = foundProv ? foundProv.th : l.name;
+            
+            document.getElementById('weatherText').textContent = c.condition.text;
+            document.getElementById('temp').textContent = Math.round(c.temp_c);
+            document.getElementById('feelsLike').textContent = Math.round(c.feelslike_c);
+            document.getElementById('weatherIcon').src = "https:" + c.condition.icon.replace("64x64", "128x128");
+            
+            document.getElementById('humidity').textContent = c.humidity;
+            document.getElementById('uv').textContent = Math.round(c.uv);
+            document.getElementById('wind').textContent = Math.round(c.wind_kph);
+            document.getElementById('vis').textContent = Math.round(c.vis_km);
+            
+            if (aqi) {
+                const pm25Value = aqi.pm2_5 || 0;
+                const pm10Value = aqi.pm10 || 0;
+                const epa = aqi['us-epa-index'] || 1;
+                
+                document.getElementById('pm25').textContent = pm25Value.toFixed(1);
+                document.getElementById('pm10').textContent = pm10Value.toFixed(1);
+                document.getElementById('epaIndex').textContent = epa;
+                
+                document.getElementById('so2').textContent = (aqi.so2 || 0).toFixed(2);
+                document.getElementById('no2').textContent = (aqi.no2 || 0).toFixed(2);
+                document.getElementById('o3').textContent = (aqi.o3 || 0).toFixed(2);
+                document.getElementById('co').textContent = (aqi.co || 0).toFixed(2);
+                
+                const colors = {
+                    1: { text: "ดีมาก", bg: "bg-emerald-500/10", txt: "text-emerald-500" },
+                    2: { text: "ปานกลาง", bg: "bg-yellow-500/10", txt: "text-yellow-500" },
+                    3: { text: "เริ่มมีผล", bg: "bg-orange-500/10", txt: "text-orange-500" },
+                    4: { text: "มีผลกระทบ", bg: "bg-red-500/10", txt: "text-red-500" },
+                    5: { text: "อันตราย", bg: "bg-purple-500/10", txt: "text-purple-500" },
+                    6: { text: "อันตรายมาก", bg: "bg-rose-500/10", txt: "text-rose-500" }
+                };
+                
+                const status = colors[epa] || colors[1];
+                const badge = document.getElementById('aqiStatus');
+                badge.className = `text-xs px-3 py-1.5 rounded-full font-medium ${status.bg} ${status.txt}`;
+                badge.textContent = status.text;
+            }
+            
+            updateAstronomy();
+            updateHourlyForecast();
+            updateDailyForecast();
+            updateAQIChart();
+        }
+
+        function updateAstronomy() {
+            if (!currentAstronomyData) return;
+            
+            const astro = currentAstronomyData.astronomy.astro;
+            document.getElementById('sunriseTime').textContent = astro.sunrise;
+            document.getElementById('sunsetTime').textContent = astro.sunset;
+            
+            const moonPhases = {
+                'New moon': 'ดวงจันทร์เหมือนวัน',
+                'Waxing crescent': 'เสี้ยวเดือนแรก',
+                'First quarter': 'จันทร์ครึ่งดวง',
+                'Waxing gibbous': 'จันทร์เสี้ยวสูง',
+                'Full moon': 'ดวงจันทร์เต็มดวง',
+                'Waning gibbous': 'จันทร์เสี้ยวลง',
+                'Last quarter': 'จันทร์ครึ่งดวงลง',
+                'Waning crescent': 'เสี้ยวเดือนสุดท้าย'
+            };
+            
+            document.getElementById('moonPhase').textContent = moonPhases[astro.moon_phase] || astro.moon_phase;
+        }
+
+        function updateHourlyForecast() {
+            if (!currentForecastData) return;
+            
+            const container = document.getElementById('hourlyContainer');
+            container.innerHTML = '';
+            
+            const today = currentForecastData.forecast.forecastday[0].hour;
+            const now = new Date();
+            
+            today.forEach((hour) => {
+                const hourTime = new Date(hour.time);
+                if (hourTime < now) return;
+                
+                const hourCard = document.createElement('div');
+                hourCard.className = 'flex-shrink-0 bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 min-w-[120px] text-center border border-slate-200 dark:border-slate-700 hover:border-primary dark:hover:border-primary transition-colors';
+                hourCard.innerHTML = `
+                    <p class="text-xs font-medium text-slate-500 mb-2">${hourTime.getHours()}:00</p>
+                    <img src="https:${hour.condition.icon}" alt="weather" class="w-12 h-12 mx-auto mb-2">
+                    <p class="text-xl font-bold">${Math.round(hour.temp_c)}°</p>
+                    <p class="text-xs text-slate-400 mt-1">${hour.condition.text}</p>
+                    <p class="text-xs text-slate-400 mt-1">💧 ${hour.humidity}%</p>
+                `;
+                container.appendChild(hourCard);
+            });
+        }
+
+        function updateDailyForecast() {
+            if (!currentForecastData) return;
+            
+            const container = document.getElementById('forecastContainer');
+            container.innerHTML = '';
+            
+            const days = currentForecastData.forecast.forecastday.slice(1, 8);
+            
+            days.forEach((day) => {
+                const dayDate = new Date(day.date);
+                const dayNames = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
+                const monthNames = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+                
+                const dayName = dayNames[dayDate.getDay()];
+                const dateStr = `${dayDate.getDate()} ${monthNames[dayDate.getMonth()]}`;
+                
+                const forecastItem = document.createElement('div');
+                forecastItem.className = 'bg-slate-50 dark:bg-slate-800/30 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 hover:border-primary dark:hover:border-primary transition-colors';
+                forecastItem.innerHTML = `
+                    <div class="grid grid-cols-12 gap-4 items-center">
+                        <div class="col-span-3">
+                            <p class="font-semibold">${dayName}</p>
+                            <p class="text-xs text-slate-500">${dateStr}</p>
+                        </div>
+                        <div class="col-span-2 flex justify-center">
+                            <img src="https:${day.day.condition.icon}" alt="weather" class="w-12 h-12">
+                        </div>
+                        <div class="col-span-3">
+                            <p class="text-sm">${day.day.condition.text}</p>
+                            <p class="text-xs text-slate-500">💧 ${day.day.avghumidity}%</p>
+                        </div>
+                        <div class="col-span-4 flex items-center justify-between">
+                            <div class="text-right">
+                                <p class="text-sm font-bold">สูง ${Math.round(day.day.maxtemp_c)}°</p>
+                                <p class="text-xs text-slate-500">ต่ำ ${Math.round(day.day.mintemp_c)}°</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xs text-slate-500">ลม</p>
+                                <p class="text-sm font-semibold">${Math.round(day.day.maxwind_kph)} km/h</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(forecastItem);
+            });
+        }
+
+        function updateAQIChart() {
+            if (!currentForecastData) return;
+            
+            const ctx = document.getElementById('aqiChart');
+            if (!ctx) return;
+            
+            const times = [];
+            const aqiValues = [];
+            
+            currentForecastData.forecast.forecastday[0].hour.forEach((hour) => {
+                const hourTime = new Date(hour.time);
+                times.push(hourTime.getHours() + ':00');
+                const epa = hour.air_quality['us-epa-index'] || 1;
+                aqiValues.push(epa);
+            });
+            
+            if (aqiChart) {
+                aqiChart.destroy();
+            }
+            
+            aqiChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: times,
+                    datasets: [{
+                        label: 'EPA AQI Index',
+                        data: aqiValues,
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        borderWidth: 2,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#6366f1',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 6,
+                            min: 0,
+                            ticks: {
+                                color: '#64748b'
+                            },
+                            grid: {
+                                color: 'rgba(100, 116, 139, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#64748b'
+                            },
+                            grid: {
+                                color: 'rgba(100, 116, 139, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ============================================
+        // TAB MANAGEMENT
+        // ============================================
+        function switchTab(tab) {
+            const tabs = ['details', 'hourly', 'forecast', 'aqi'];
+            
+            tabs.forEach(t => {
+                document.getElementById(`${t}-tab`).classList.add('hidden');
+                document.getElementById(`tab-${t}`).classList.remove('tab-active', 'text-primary', 'border-primary');
+                document.getElementById(`tab-${t}`).classList.add('text-slate-500', 'dark:text-slate-400', 'border-transparent');
+            });
+            
+            document.getElementById(`${tab}-tab`).classList.remove('hidden');
+            document.getElementById(`tab-${tab}`).classList.add('tab-active', 'text-primary', 'border-primary');
+            document.getElementById(`tab-${tab}`).classList.remove('text-slate-500', 'dark:text-slate-400', 'border-transparent');
+        }
+
+        // ============================================
+        // COMPARE CITIES
+        // ============================================
+        function openCompareModal() {
+            document.getElementById('compareModal').classList.remove('hidden');
+        }
+
+        function closeCompareModal() {
+            document.getElementById('compareModal').classList.add('hidden');
+        }
+
+        async function executeCompare() {
+            const city1 = document.getElementById('compareCity1').value;
+            const city2 = document.getElementById('compareCity2').value;
+            
+            if (!city1 || !city2) {
+                showToast('กรุณาเลือกจังหวัดทั้งสองจังหวัด', 'error');
+                return;
+            }
+            
+            try {
+                const [data1, data2] = await Promise.all([
+                    fetch(`https://api.weatherapi.com/v1/current.json?key=${weatherApiKey}&q=${city1}&aqi=yes&lang=th`).then(r => r.json()),
+                    fetch(`https://api.weatherapi.com/v1/current.json?key=${weatherApiKey}&q=${city2}&aqi=yes&lang=th`).then(r => r.json())
+                ]);
+                
+                const results = document.getElementById('compareResults');
+                const result1 = document.getElementById('compareCity1Result');
+                const result2 = document.getElementById('compareCity2Result');
+                
+                result1.innerHTML = buildCompareCard(data1);
+                result2.innerHTML = buildCompareCard(data2);
+                results.classList.remove('hidden');
+                
+            } catch (err) {
+                showToast('ไม่สามารถเปรียบเทียบข้อมูลได้', 'error');
+            }
+        }
+
+        function buildCompareCard(data) {
+            const c = data.current;
+            const l = data.location;
+            const foundProv = provincesList.find(p => p.en.toLowerCase() === l.name.toLowerCase());
+            const epa = c.air_quality?.['us-epa-index'] || 1;
+            
+            return `
+                <div>
+                    <h4 class="font-bold text-lg mb-4">${foundProv ? foundProv.th : l.name}</h4>
+                    <div class="grid grid-cols-2 gap-3 text-sm">
+                        <div>
+                            <p class="text-slate-500 dark:text-slate-400 text-xs mb-1">อุณหภูมิ</p>
+                            <p class="text-2xl font-bold">${Math.round(c.temp_c)}°</p>
+                        </div>
+                        <div>
+                            <p class="text-slate-500 dark:text-slate-400 text-xs mb-1">สภาพ</p>
+                            <p class="font-semibold">${c.condition.text}</p>
+                        </div>
+                        <div>
+                            <p class="text-slate-500 dark:text-slate-400 text-xs mb-1">ความชื้น</p>
+                            <p class="text-lg font-bold">${c.humidity}%</p>
+                        </div>
+                        <div>
+                            <p class="text-slate-500 dark:text-slate-400 text-xs mb-1">AQI</p>
+                            <p class="text-lg font-bold text-primary">${epa}/6</p>
+                        </div>
+                        <div>
+                            <p class="text-slate-500 dark:text-slate-400 text-xs mb-1">PM2.5</p>
+                            <p class="text-lg font-bold">${(c.air_quality?.pm2_5 || 0).toFixed(1)}</p>
+                        </div>
+                        <div>
+                            <p class="text-slate-500 dark:text-slate-400 text-xs mb-1">ลม</p>
+                            <p class="text-lg font-bold">${Math.round(c.wind_kph)} km/h</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ============================================
+        // AI ANALYSIS
+        // ============================================
+        async function askGemini() {
+            if (!currentWeatherData) return;
+            
+            const btn = document.getElementById('aiButton');
+            const btnText = document.getElementById('aiBtnText');
+            const btnIcon = document.getElementById('aiBtnIcon');
+            const container = document.getElementById('aiResponseContainer');
+            const content = document.getElementById('aiContent');
+            
+            btn.disabled = true;
+            btnText.textContent = "กำลังวิเคราะห์...";
+            btnIcon.classList.remove('animate-pulse');
+            btnIcon.textContent = 'hourglass_empty';
+            btnIcon.classList.add('animate-spin');
+            
+            const locName = document.getElementById('cityName').textContent;
+            const temp = currentWeatherData.current.temp_c;
+            const cond = currentWeatherData.current.condition.text;
+            const pm25 = currentWeatherData.current.air_quality?.pm2_5 || 0;
+            const epa = currentWeatherData.current.air_quality?.['us-epa-index'] || 1;
+            const humidity = currentWeatherData.current.humidity;
+            const windKph = currentWeatherData.current.wind_kph;
+            
+            const prompt = `คุณคือผู้ช่วย AI ด้านสภาพอากาศที่ชาญฉลาด เป็นมิตรและเป็นกันเอง
+
+ข้อมูลสภาพอากาศที่ ${locName}:
+- อุณหภูมิ: ${temp}°C
+- สภาพอากาศ: ${cond}
+- ความชื้น: ${humidity}%
+- ความเร็วลม: ${windKph} km/h
+- PM2.5: ${pm25.toFixed(1)} μg/m³
+- EPA AQI: ${epa}/6
+
+ขอให้ให้คำแนะนำสั้นๆ กระชับ (ไม่เกิน 150 คำ) ในรูป HTML ที่มี:
+1. สรุปความรู้สึก (พร้อม emoji)
+2. คำแนะนำเกี่ยวกับสุขภาพ (ฝุ่น/แดดแรง)
+3. การแนะนำการแต่งตัว
+4. กิจกรรมที่เหมาะสม
+
+ใช้ <ul> <li> <strong> และ HTML tags ได้เลย`;
+            
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${geminiApiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                });
+                
+                const data = await response.json();
+                const aiText = data.candidates[0].content.parts[0].text;
+                
+                content.innerHTML = aiText;
+                container.classList.remove('hidden');
+                
+                const now = new Date();
+                document.getElementById('aiTimestamp').textContent = `วิเคราะห์เมื่อ ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')} น.`;
+                
+                container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+            } catch (e) {
+                console.error(e);
+                content.innerHTML = "<p class='text-red-500'>ขออภัย ระบบ AI ขัดข้องชั่วคราว</p>";
+                container.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btnText.textContent = "วิเคราะห์สภาพอากาศด้วย AI";
+                btnIcon.textContent = 'auto_awesome';
+                btnIcon.classList.remove('animate-spin');
+                btnIcon.classList.add('animate-pulse');
+            }
+        }
+
+        // ============================================
+        // UTILITY FUNCTIONS
+        // ============================================
+        function showMainLoader(show) {
+            const loader = document.getElementById('mainLoader');
+            if (show) loader.classList.remove('hidden');
+            else loader.classList.add('hidden');
+        }
+
+        function showError(msg) {
+            document.getElementById('weatherContent').classList.add('hidden');
+            document.getElementById('welcomeState').classList.add('hidden');
+            const errDiv = document.getElementById('errorState');
+            errDiv.classList.remove('hidden');
+            document.getElementById('errorMsg').textContent = msg;
+        }
+
+        if (localStorage.theme === 'light' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+            document.documentElement.classList.remove('dark');
+            document.getElementById('theme-icon').innerText = 'dark_mode';
+        } else {
+            document.documentElement.classList.add('dark');
+            document.getElementById('theme-icon').innerText = 'light_mode';
+        }
+    </script>
+</body>
+</html>

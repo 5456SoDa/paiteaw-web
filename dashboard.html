@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="th" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="theme-color" content="#6366f1">
+  <title>แดชบอร์ด - จัดการเวลาเที่ยว-ค่าใช้จ่าย</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+  <link rel="stylesheet" href="styles.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="utils.js" defer></script>
+  <script src="logic.js" defer></script>
+  <script src="uiGenerator.js" defer></script>
+  <script src="notificationManager.js" defer></script>
+  <script src="eventHandlers.js" defer></script>
+  <script src="profile-menu-enhancement.js" defer></script>
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { extend: { fontFamily: { sans: ['Kanit', 'sans-serif'] } } }
+    }
+  </script>
+
+  <style>
+    /* ============ PHASE 2 & 3 CSS ============ */
+    
+    /* Status Filter Buttons */
+    .trip-status-btn {
+      transition: all 0.3s ease;
+    }
+    
+    .trip-status-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .trip-status-btn.active {
+      background: #6366f1;
+      border-color: #6366f1;
+      color: white;
+    }
+    
+    /* Empty State */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1rem;
+      text-align: center;
+      min-height: 300px;
+    }
+    
+    .empty-state-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      opacity: 0.8;
+    }
+    
+    .empty-state-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 0.5rem;
+    }
+    
+    .dark .empty-state-title {
+      color: #f3f4f6;
+    }
+    
+    .empty-state-text {
+      color: #6b7280;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+    }
+    
+    .dark .empty-state-text {
+      color: #d1d5db;
+    }
+    
+    /* Recent Trips Section */
+    .recent-trips-section {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+      border-radius: 1rem;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border: 1px solid rgba(99, 102, 241, 0.2);
+    }
+    
+    .dark .recent-trips-section {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
+      border-color: rgba(99, 102, 241, 0.3);
+    }
+    
+    .recent-trips-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1f2937;
+    }
+    
+    .dark .recent-trips-header {
+      color: #f3f4f6;
+    }
+    
+    .recent-trip-card {
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .recent-trip-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.15);
+    }
+    
+    /* Skeleton Loading */
+    .skeleton {
+      background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+      background-size: 200% 100%;
+      animation: skeleton-loading 1.5s infinite;
+      border-radius: 0.5rem;
+    }
+    
+    .dark .skeleton {
+      background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+    }
+    
+    @keyframes skeleton-loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    
+    /* Bulk Action Bar */
+    .bulk-action-bar {
+      position: sticky;
+      bottom: 0;
+      background: white;
+      dark:background: #1f2937;
+      border-top: 2px solid #e5e7eb;
+      dark:border-top-color: #374151;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      z-index: 40;
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+      animation: slideUp 0.3s ease-out;
+    }
+    
+    .dark .bulk-action-bar {
+      background: #1f2937;
+      border-top-color: #374151;
+    }
+    
+    @keyframes slideUp {
+      from {
+        transform: translateY(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    .bulk-action-bar button {
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .bulk-action-bar button:hover {
+      transform: scale(1.05);
+    }
+    
+    /* Trip Checkbox */
+    .trip-checkbox {
+      cursor: pointer;
+      width: 1.25rem;
+      height: 1.25rem;
+      accent-color: #6366f1;
+    }
+    
+    /* Keyboard Shortcut Hints */
+    .keyboard-hint {
+      display: inline-block;
+      background: #f3f4f6;
+      dark:background: #374151;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+      font-family: monospace;
+      color: #6b7280;
+      dark:color: #9ca3af;
+      margin-left: 0.5rem;
+    }
+    
+    /* Accessibility */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+    
+    /* Focus visible for keyboard navigation */
+    *:focus-visible {
+      outline: 3px solid #6366f1;
+      outline-offset: 2px;
+    }
+    
+    /* High contrast mode */
+    @media (prefers-contrast: more) {
+      button, input, select, textarea {
+        border-width: 2px;
+      }
+    }
+    
+    /* ============ ABOUT MODAL ============ */
+    .about-modal-content {
+      max-width: 600px;
+    }
+
+    .about-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .about-section h3 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: #1f2937;
+    }
+
+    .dark .about-section h3 {
+      color: #f3f4f6;
+    }
+
+    .about-section p {
+      color: #6b7280;
+      line-height: 1.6;
+      margin-bottom: 0.5rem;
+    }
+
+    .dark .about-section p {
+      color: #d1d5db;
+    }
+
+    .tech-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .tech-badge {
+      background: #e5e7eb;
+      dark:background: #374151;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      text-align: center;
+    }
+
+    .dark .tech-badge {
+      background: #374151;
+      color: #e5e7eb;
+    }
+
+    /* ============ SETTINGS MODAL ============ */
+    .settings-container {
+      max-width: 500px;
+    }
+
+    .avatar-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .avatar-preview {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #6366f1;
+      margin-bottom: 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .avatar-preview:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    .change-avatar-btn {
+      background: #6366f1;
+      color: white;
+      padding: 0.5rem 1.5rem;
+      border-radius: 0.5rem;
+      border: none;
+      cursor: pointer;
+      font-size: 0.875rem;
+      transition: all 0.3s;
+    }
+
+    .change-avatar-btn:hover {
+      background: #4f46e5;
+    }
+
+    .user-info-section {
+      background: #f3f4f6;
+      dark:background: #374151;
+      padding: 1.5rem;
+      border-radius: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .dark .user-info-section {
+      background: #374151;
+    }
+
+    .info-item {
+      margin-bottom: 1rem;
+    }
+
+    .info-label {
+      font-size: 0.875rem;
+      color: #6b7280;
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+    }
+
+    .dark .info-label {
+      color: #9ca3af;
+    }
+
+    .info-value {
+      color: #1f2937;
+      font-weight: 500;
+    }
+
+    .dark .info-value {
+      color: #f3f4f6;
+    }
+
+    .password-section {
+      background: #f3f4f6;
+      dark:background: #374151;
+      padding: 1.5rem;
+      border-radius: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .dark .password-section {
+      background: #374151;
+    }
+
+    .password-section h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #1f2937;
+    }
+
+    .dark .password-section h3 {
+      color: #f3f4f6;
+    }
+
+    .danger-zone {
+      background: #fee2e2;
+      dark:background: #7f1d1d;
+      padding: 1.5rem;
+      border-radius: 0.75rem;
+      margin-top: 1.5rem;
+      border: 2px solid #ef4444;
+    }
+
+    .dark .danger-zone {
+      background: #7f1d1d;
+      border-color: #f87171;
+    }
+
+    .danger-zone-title {
+      color: #dc2626;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .danger-btn {
+      background: #ef4444;
+      color: white;
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s;
+      margin-top: 0.5rem;
+    }
+
+    .danger-btn:hover {
+      background: #dc2626;
+    }
+
+    .danger-btn:active {
+      transform: scale(0.98);
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-50 dark:bg-gray-950">
+
+  <div id="loadingBar" class="loading-bar"></div>
+
+  <!-- Header -->
+  <header class="bg-white dark:bg-gray-900 shadow-md sticky top-0 z-40 border-b border-gray-200 dark:border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center gap-3">
+          <img src="https://i.postimg.cc/d3Jnyv2F/11zon-cropped.png" alt="Logo" class="w-10 h-10 rounded-full">
+          <h1 class="text-xl font-bold text-gray-900 dark:text-white">แดชบอร์ด</h1>
+        </div>
+        <div class="flex items-center gap-4">
+          <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 ripple-btn transition-colors">
+            <span id="theme-icon" class="material-symbols-outlined text-gray-600 dark:text-gray-300">dark_mode</span>
+          </button>
+          <button id="profileMenuBtn" class="flex items-center gap-2 px-3 py-2 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white ripple-btn cta-btn transition-all">
+            <img id="profileAvatar" src="https://i.postimg.cc/3wB0kP0D/default-avatar.png" alt="Profile" class="w-8 h-8 rounded-full object-cover">
+            <span id="profileName" class="hidden sm:inline text-sm font-medium">ผู้ใช้</span>
+            <span class="material-symbols-outlined text-sm">expand_more</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 p-4 sm:p-6 lg:p-8">
+    <div class="max-w-7xl mx-auto">
+      <div class="mb-8">
+        <h2 class="text-3xl font-bold text-gray-900 dark:text-white">ยินดีต้อนรับ 👋</h2>
+        <p id="welcomeMessage" class="text-gray-600 dark:text-gray-400 mt-2">กำลังโหลด...</p>
+        <div class="mt-3 text-sm text-gray-500 dark:text-gray-400">
+          <span class="keyboard-hint">Ctrl+N</span> สร้างทริป
+          <span class="keyboard-hint">Ctrl+E</span> เพิ่มค่าใช้จ่าย
+          <span class="keyboard-hint">Esc</span> ปิด modal
+          <span class="keyboard-hint">/</span> ค้นหา
+        </div>
+      </div>
+
+      <!-- Tabs with accessibility -->
+      <div class="flex gap-4 mb-8 border-b border-gray-200 dark:border-gray-700 overflow-x-auto pb-4" role="tablist">
+        <button class="tab-btn py-2 px-4 font-medium whitespace-nowrap tab-active text-indigo-600" data-tab="overview" role="tab" aria-selected="true" aria-controls="overview-tab">📊 ภาพรวม</button>
+        <button class="tab-btn py-2 px-4 font-medium whitespace-nowrap text-gray-600 dark:text-gray-400" data-tab="trips" role="tab" aria-selected="false" aria-controls="trips-tab">🗺️ ทริป</button>
+        <button class="tab-btn py-2 px-4 font-medium whitespace-nowrap text-gray-600 dark:text-gray-400" data-tab="expenses" role="tab" aria-selected="false" aria-controls="expenses-tab">💰 ค่าใช้จ่าย</button>
+        <button class="tab-btn py-2 px-4 font-medium whitespace-nowrap text-gray-600 dark:text-gray-400" data-tab="analytics" role="tab" aria-selected="false" aria-controls="analytics-tab">📈 วิเคราะห์</button>
+      </div>
+
+      <!-- Overview Tab -->
+      <div id="overview-tab" class="tab-content">
+        <div id="stats-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12"></div>
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white">ทริปล่าสุด</h2>
+          <button onclick="openCreateTripModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg ripple-btn cta-btn">
+            ➕ สร้างทริปใหม่
+          </button>
+        </div>
+        <div id="recent-trips" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+      </div>
+
+      <!-- Trips Tab -->
+      <div id="trips-tab" class="tab-content hidden">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white">ทริปของฉัน</h2>
+          <button onclick="openCreateTripModal()" class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg ripple-btn cta-btn">
+            ➕ สร้างทริป
+          </button>
+        </div>
+        <div class="mb-6 flex gap-2 flex-wrap">
+          <input type="text" id="tripSearch" placeholder="ค้นหาชื่อทริป..." class="flex-1 min-w-[200px] px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-indigo-500" aria-label="ค้นหาทริป">
+        </div>
+        
+        <div class="mb-6 flex gap-2 flex-wrap">
+          <button onclick="filterTripsByStatus('all')" class="px-4 py-2 rounded-full border-2 border-indigo-600 bg-indigo-600 text-white trip-status-btn active" data-status="all" aria-label="แสดงทริปทั้งหมด">ทั้งหมด</button>
+          <button onclick="filterTripsByStatus('planning')" class="px-4 py-2 rounded-full border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 trip-status-btn" data-status="planning" aria-label="แสดงทริปที่กำลังวางแผน">🔵 วางแผน</button>
+          <button onclick="filterTripsByStatus('ongoing')" class="px-4 py-2 rounded-full border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 trip-status-btn" data-status="ongoing" aria-label="แสดงทริปที่กำลังดำเนินการ">🟢 กำลังใช้</button>
+          <button onclick="filterTripsByStatus('completed')" class="px-4 py-2 rounded-full border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 trip-status-btn" data-status="completed" aria-label="แสดงทริปที่เสร็จแล้ว">✅ เสร็จแล้ว</button>
+        </div>
+        <div id="tripsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+      </div>
+
+      <!-- Expenses Tab -->
+      <div id="expenses-tab" class="tab-content hidden">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white">ค่าใช้จ่าย</h2>
+          <button onclick="openAddExpenseModal()" class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg ripple-btn cta-btn">
+            ➕ เพิ่ม
+          </button>
+        </div>
+        
+        <div class="mb-6 bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">คดเพื่อเลือกทริปที่จะใส่ค่าใช้จ่ายไป</label>
+          <select id="expenseFilterTrip" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white">
+            <option value="">-- ทั้งหมด --</option>
+          </select>
+        </div>
+        
+        <div class="mb-6 flex gap-4 flex-wrap">
+          <input type="text" id="expenseSearch" placeholder="ค้นหาค่าใช้จ่าย..." class="flex-1 min-w-[200px] px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-indigo-500" aria-label="ค้นหาค่าใช้จ่าย">
+          <select id="expenseFilterCategory" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white" aria-label="ฟิลเตอร์ตามหมวดหมู่">
+            <option value="">หมวดทั้งหมด</option>
+            <option value="food">🍽️ อาหาร</option>
+            <option value="transport">🚗 ขนส่ง</option>
+            <option value="accommodation">🏨 ที่พัก</option>
+            <option value="activity">🎭 กิจกรรม</option>
+            <option value="shopping">🛍️ ช้อปปิ้ง</option>
+            <option value="other">📌 อื่นๆ</option>
+          </select>
+        </div>
+        <div id="expensesContainer" class="space-y-3"></div>
+      </div>
+
+      <!-- Analytics Tab -->
+      <div id="analytics-tab" class="tab-content hidden">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">การวิเคราะห์</h2>
+        
+        <div class="mb-6 bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">คดเพื่อเลือกทริปที่จะวิเคราะห์</label>
+          <select id="analyticsTrip" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white">
+            <option value="">-- เลือกทริป --</option>
+          </select>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">ค่าใช้จ่ายตามหมวดหมู่</h3>
+            <canvas id="categoryChart" height="300"></canvas>
+          </div>
+          <div class="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">ค่าใช้จ่ายรายวัน</h3>
+            <canvas id="dailyChart" height="300"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- CREATE TRIP MODAL - FIXED: ลบช่องงบประมาณออก -->
+  <div id="createTripModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 hidden backdrop-blur-sm overflow-y-auto modal" onclick="closeCreateTripModal(event)">
+    <div class="modal-content bg-white dark:bg-gray-800 rounded-lg p-8 max-w-2xl w-full m-4 max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+      <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">สร้างทริปใหม่</h2>
+      <form id="createTripForm" class="space-y-6">
+        <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center cursor-pointer hover:border-indigo-600" onclick="document.getElementById('tripImageInput').click()">
+          <input type="file" id="tripImageInput" accept="image/*" class="hidden">
+          <div id="imagePreviewArea">
+            <span class="material-symbols-outlined text-5xl text-gray-400 mb-2 block">image</span>
+            <p class="text-gray-600 dark:text-gray-400 mb-2 font-medium">เลือกรูปภาพ</p>
+          </div>
+          <div id="imagePreview" style="display: none;">
+            <img id="previewImg" src="" alt="Preview" class="preview-img mx-auto">
+            <button type="button" onclick="removeImage(event)" class="mt-2 px-4 py-1 bg-red-600 text-white rounded text-sm ripple-btn">ลบ</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">ชื่อทริป <span class="text-red-500">*</span></label>
+            <input type="text" id="tripName" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white" placeholder="เช่น เที่ยวกรุงเทพ">
+            <p id="tripNameError" class="error-message"></p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">สถานที่ไป <span class="text-red-500">*</span></label>
+            <input type="text" id="tripDestination" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white" placeholder="เช่น กรุงเทพ">
+            <p id="tripDestinationError" class="error-message"></p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">วันเริ่มต้น <span class="text-red-500">*</span></label>
+            <input type="date" id="tripStartDate" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white">
+            <p id="tripStartDateError" class="error-message"></p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">วันสิ้นสุด <span class="text-red-500">*</span></label>
+            <input type="date" id="tripEndDate" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white">
+            <p id="tripEndDateError" class="error-message"></p>
+          </div>
+        </div>
+
+        <!-- FIXED: ลบช่องงบประมาณออก -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">สถานะทริป <span class="text-red-500">*</span></label>
+          <select id="tripStatus" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white">
+            <option value="">เลือกสถานะ</option>
+            <option value="planning">📋 วางแผน</option>
+            <option value="ongoing">🟢 กำลังใช้</option>
+            <option value="completed">✅ เสร็จแล้ว</option>
+          </select>
+          <p id="tripStatusError" class="error-message"></p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">ประเภททริป <span class="text-red-500">*</span></label>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <label class="cursor-pointer"><input type="radio" name="tripType" value="learn" required class="hidden"><div class="trip-type-option"><span class="text-3xl block mb-1">📚</span><span class="text-sm">เรียน</span></div></label>
+            <label class="cursor-pointer"><input type="radio" name="tripType" value="relax" required class="hidden"><div class="trip-type-option"><span class="text-3xl block mb-1">🏖️</span><span class="text-sm">พักผ่อน</span></div></label>
+            <label class="cursor-pointer"><input type="radio" name="tripType" value="travel" required class="hidden"><div class="trip-type-option"><span class="text-3xl block mb-1">✈️</span><span class="text-sm">ท่องเที่ยว</span></div></label>
+            <label class="cursor-pointer"><input type="radio" name="tripType" value="family" required class="hidden"><div class="trip-type-option"><span class="text-3xl block mb-1">👨‍👩‍👧‍👦</span><span class="text-sm">ครอบครัว</span></div></label>
+          </div>
+        </div>
+
+        <div class="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <button type="button" onclick="closeCreateTripModal()" class="flex-1 px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white rounded-lg ripple-btn">ยกเลิก</button>
+          <button type="submit" class="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg ripple-btn cta-btn flex items-center justify-center gap-2">
+            <span id="submitBtnText">สร้างทริป</span>
+            <span id="submitBtnSpinner" class="spinner hidden"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADD EXPENSE MODAL -->
+  <div id="addExpenseModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 hidden backdrop-blur-sm modal" onclick="closeAddExpenseModal(event)">
+    <div class="modal-content bg-white dark:bg-gray-800 rounded-lg p-8 max-w-md w-full m-4" onclick="event.stopPropagation()">
+      <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">เพิ่มค่าใช้จ่าย</h2>
+      <form id="addExpenseForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">ทริป <span class="text-red-500">*</span></label>
+          <select id="expenseTrip" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"></select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">หมวดหมู่ <span class="text-red-500">*</span></label>
+          <select id="expenseCategory" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white">
+            <option value="">เลือก...</option>
+            <option value="food">🍽️ อาหาร</option>
+            <option value="transport">🚗 ขนส่ง</option>
+            <option value="accommodation">🏨 ที่พัก</option>
+            <option value="activity">🎭 กิจกรรม</option>
+            <option value="shopping">🛍️ ช้อปปิ้ง</option>
+            <option value="other">📌 อื่นๆ</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">จำนวนเงิน (บาท) <span class="text-red-500">*</span></label>
+          <input type="number" id="expenseAmount" required step="10" min="0" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white" placeholder="0">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">วันที่ <span class="text-red-500">*</span></label>
+          <input type="date" id="expenseDate" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">รายละเอียด</label>
+          <input type="text" id="expenseDescription" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white" placeholder="เช่น กินอาหารเที่ยง">
+        </div>
+        <div class="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <button type="button" onclick="closeAddExpenseModal()" class="flex-1 px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white rounded-lg ripple-btn">ยกเลิก</button>
+          <button type="submit" class="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg ripple-btn cta-btn">เพิ่ม</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ABOUT MODAL -->
+  <div id="aboutModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 hidden backdrop-blur-sm modal overflow-y-auto" onclick="closeAboutModal(event)">
+    <div class="modal-content bg-white dark:bg-gray-800 rounded-lg p-8 w-full m-4 max-h-[90vh] overflow-y-auto about-modal-content" onclick="event.stopPropagation()">
+      <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">เกี่ยวกับเรา</h2>
+      
+      <div class="about-section">
+        <h3>📱 เวอร์ชั่น</h3>
+        <p>Paiteaw Journey Manager v1.0.0</p>
+      </div>
+
+      <div class="about-section">
+        <h3>🎯 ทำอะไรได้</h3>
+        <p>✅ จัดการแผนการท่องเที่ยว</p>
+        <p>✅ ติดตามค่าใช้จ่ายของทริป</p>
+        <p>✅ วิเคราะห์ข้อมูลค่าใช้จ่าย</p>
+        <p>✅ ดูแผนที่และสถานที่ท่องเที่ยว</p>
+        <p>✅ ตรวจสอบสภาพอากาศ</p>
+        <p>✅ ดูราคาน้ำมัน</p>
+      </div>
+
+      <div class="about-section">
+        <h3>🛠️ เทคโนโลยีที่ใช้</h3>
+        <div class="tech-list">
+          <div class="tech-badge">HTML5</div>
+          <div class="tech-badge">CSS3</div>
+          <div class="tech-badge">JavaScript</div>
+          <div class="tech-badge">Tailwind CSS</div>
+          <div class="tech-badge">Firebase</div>
+          <div class="tech-badge">Firestore</div>
+          <div class="tech-badge">Firebase Storage</div>
+          <div class="tech-badge">Chart.js</div>
+          <div class="tech-badge">Kanit Font</div>
+          <div class="tech-badge">Material Icons</div>
+        </div>
+      </div>
+
+      <div class="about-section">
+        <h3>📝 คำอธิบาย</h3>
+        <p>แอปพลิเคชันจัดการการท่องเที่ยวที่ครบวงจร ช่วยให้คุณวางแผน ติดตาม และวิเคราะห์การท่องเที่ยวของคุณได้อย่างมีประสิทธิภาพ</p>
+      </div>
+
+      <div class="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <button onclick="closeAboutModal()" class="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg ripple-btn">ปิด</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS MODAL -->
+  <div id="settingsModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 hidden backdrop-blur-sm modal overflow-y-auto" onclick="closeSettingsModal(event)">
+    <div class="modal-content bg-white dark:bg-gray-800 rounded-lg p-8 w-full m-4 max-h-[90vh] overflow-y-auto settings-container" onclick="event.stopPropagation()">
+      <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">ตั้งค่า</h2>
+      
+      <!-- Avatar Section -->
+      <div class="avatar-section">
+        <img id="settingsAvatar" src="https://i.postimg.cc/3wB0kP0D/default-avatar.png" alt="Avatar" class="avatar-preview" onclick="document.getElementById('avatarInput').click()">
+        <input type="file" id="avatarInput" accept="image/*" class="hidden">
+        <button type="button" class="change-avatar-btn" onclick="document.getElementById('avatarInput').click()">เปลี่ยนรูปโปรไฟล์</button>
+      </div>
+
+      <!-- User Info Section -->
+      <div class="user-info-section">
+        <div class="info-item">
+          <div class="info-label">ชื่อผู้ใช้</div>
+          <div class="info-value" id="settingsUsername">Loading...</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">อีเมล์</div>
+          <div class="info-value" id="settingsEmail">Loading...</div>
+        </div>
+      </div>
+
+      <!-- Change Password Section -->
+      <div class="password-section">
+        <h3>เปลี่ยนรหัสผ่าน</h3>
+        <form id="changePasswordForm" class="space-y-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">รหัสผ่านปัจจุบัน</label>
+            <input type="password" id="currentPassword" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white" placeholder="กรอกรหัสผ่านเดิม">
+            <p id="currentPasswordError" class="error-message"></p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">รหัสผ่านใหม่</label>
+            <input type="password" id="newPassword" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white" placeholder="กรอกรหัสผ่านใหม่">
+            <p id="newPasswordError" class="error-message"></p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">ยืนยันรหัสผ่านใหม่</label>
+            <input type="password" id="confirmPassword" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white" placeholder="ยืนยันรหัสผ่านใหม่">
+            <p id="confirmPasswordError" class="error-message"></p>
+          </div>
+          <button type="submit" class="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg ripple-btn">บันทึกรหัสผ่าน</button>
+        </form>
+      </div>
+
+      <!-- Danger Zone -->
+      <div class="danger-zone">
+        <div class="danger-zone-title">⚠️ เขตอันตราย</div>
+        <button type="button" class="danger-btn" onclick="handleLogout()">
+          <span class="material-symbols-outlined">logout</span>
+          ออกจากระบบ
+        </button>
+        <button type="button" class="danger-btn" onclick="handleDeleteAccount()">
+          <span class="material-symbols-outlined">delete_forever</span>
+          ลบบัญชี
+        </button>
+      </div>
+
+      <div class="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700 mt-6">
+        <button onclick="closeSettingsModal()" class="flex-1 px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-white rounded-lg ripple-btn">ปิด</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAUMhtE1uw9vj7yzMKIZ_w769CrUDwEoww",
+      authDomain: "paiteaw-web.firebaseapp.com",
+      projectId: "paiteaw-web",
+      storageBucket: "paiteaw-web.firebasestorage.app",
+      messagingSenderId: "176353291629",
+      appId: "1:176353291629:web:de680e1dcc07b8a1c6be64"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    window.tripManager = new TripManager(db, storage);
+    window.expenseManager = new ExpenseManager(db);
+    window.analyticsManager = new AnalyticsManager([]);
+
+    let currentUser = null;
+
+    // FIXED: Profile Menu Button - Now triggers properly
+    document.getElementById('profileMenuBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (currentUser) {
+        ProfileMenuGenerator.showProfileMenu(currentUser);
+      }
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#profileMenuBtn') && !e.target.closest('.profile-menu-overlay')) {
+        window.closeProfileMenu?.();
+      }
+    });
+
+    // DARK MODE
+    const themeToggle = document.getElementById('theme-toggle');
+    function setTheme(isDark) {
+      document.documentElement.classList.toggle('dark', isDark);
+      document.getElementById('theme-icon').textContent = isDark ? 'light_mode' : 'dark_mode';
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    }
+    
+    if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      setTheme(true);
+    }
+    themeToggle?.addEventListener('click', () => setTheme(!document.documentElement.classList.contains('dark')));
+
+    // TAB NAVIGATION
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => {
+          b.classList.remove('tab-active', 'text-indigo-600');
+          b.classList.add('text-gray-600', 'dark:text-gray-400');
+        });
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+        
+        btn.classList.add('tab-active', 'text-indigo-600');
+        btn.classList.remove('text-gray-600', 'dark:text-gray-400');
+        document.getElementById(`${btn.dataset.tab}-tab`).classList.remove('hidden');
+      });
+    });
+
+    // MODALS
+    window.openCreateTripModal = () => {
+      document.getElementById('createTripModal').classList.remove('hidden');
+      UIGenerator?.clearErrors?.();
+      document.getElementById('createTripForm').reset();
+    };
+
+    window.closeCreateTripModal = (e) => {
+      if (!e || e.target.id === 'createTripModal') document.getElementById('createTripModal').classList.add('hidden');
+    };
+
+    window.openAddExpenseModal = () => document.getElementById('addExpenseModal').classList.remove('hidden');
+    window.closeAddExpenseModal = (e) => {
+      if (!e || e.target.id === 'addExpenseModal') document.getElementById('addExpenseModal').classList.add('hidden');
+    };
+
+    window.openAboutModal = () => document.getElementById('aboutModal').classList.remove('hidden');
+    window.closeAboutModal = (e) => {
+      if (!e || e.target.id === 'aboutModal') document.getElementById('aboutModal').classList.add('hidden');
+    };
+
+    window.openSettingsModal = () => {
+      document.getElementById('settingsModal').classList.remove('hidden');
+      if (currentUser) {
+        document.getElementById('settingsUsername').textContent = currentUser.displayName || 'ผู้ใช้';
+        document.getElementById('settingsEmail').textContent = currentUser.email;
+        document.getElementById('settingsAvatar').src = currentUser.photoURL || 'https://i.postimg.cc/3wB0kP0D/default-avatar.png';
+      }
+    };
+
+    window.closeSettingsModal = (e) => {
+      if (!e || e.target.id === 'settingsModal') document.getElementById('settingsModal').classList.add('hidden');
+    };
+
+    window.handleLogout = async () => {
+      try {
+        await signOut(auth);
+        window.notificationManager?.success?.('ออกจากระบบแล้ว', 1000);
+        setTimeout(() => window.location.href = 'index.html', 800);
+      } catch (error) {
+        window.notificationManager?.error?.('ออกล้มเหลว', 2000);
+      }
+    };
+
+    window.handleDeleteAccount = () => {
+      const confirmed = confirm('⚠️ ต้องการลบบัญชีหรือไม่? การกระทำนี้ไม่สามารถกลับได้');
+      if (confirmed) {
+        window.notificationManager?.info?.('ฟีเจอร์ลบบัญชีจะมาเร็วๆนี้', 2000);
+      }
+    };
+
+    window.removeImage = (e) => {
+      if (e) e.preventDefault();
+      document.getElementById('tripImageInput').value = '';
+      document.getElementById('imagePreviewArea').style.display = 'block';
+      document.getElementById('imagePreview').style.display = 'none';
+    };
+
+    // AUTH & DATA INITIALIZATION
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        currentUser = user;
+        window.currentUser = user;
+        const displayName = user.displayName || 'ผู้ใช้';
+        document.getElementById('welcomeMessage').textContent = `ยินดีต้อนรับ ${displayName}!`;
+        document.getElementById('profileName').textContent = displayName;
+        document.getElementById('profileAvatar').src = user.photoURL || 'https://i.postimg.cc/3wB0kP0D/default-avatar.png';
+        window.notificationManager?.success?.('เข้าสู่ระบบสำเร็จ!', 2000);
+
+        // ============ LOAD INITIAL DATA ============
+        try {
+          UIGenerator.showLoadingBar();
+
+          // Load trips
+          const trips = await window.tripManager.loadTrips(user.uid);
+          
+          // Load expenses
+          const expenses = await window.expenseManager.loadExpenses(user.uid);
+          window.analyticsManager.expenses = expenses;
+
+          // Populate selects
+          UIGenerator.populateSelectOptions('expenseTrip', trips, 'เลือกทริป...');
+          UIGenerator.populateSelectOptions('expenseFilterTrip', trips, '-- ทั้งหมด --');
+          UIGenerator.populateSelectOptions('analyticsTrip', trips, '-- เลือกทริป --');
+
+          // Calculate and display stats
+          const stats = window.tripManager.calculateStats();
+          UIGenerator.updateStats(stats);
+
+          // Render initial data
+          if (window.renderTripsList) {
+            window.renderTripsList(trips);
+          }
+          if (window.renderExpensesList) {
+            window.renderExpensesList(expenses);
+          }
+
+          UIGenerator.hideLoadingBar();
+        } catch (error) {
+          console.error('Data initialization error:', error);
+          window.notificationManager?.error?.('เกิดข้อผิดพลาด', 'ไม่สามารถโหลดข้อมูลได้', 3000);
+          UIGenerator.hideLoadingBar();
+        }
+      } else {
+        window.location.href = 'login.html';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="th" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="theme-color" content="#6366f1">
+  <meta name="description" content="จัดการเวลาเที่ยว-ค่าใช้จ่าย แอปพลิเคชันมือถือสำหรับวางแผนการเดินทาง">
+  <title>จัดการเวลาเที่ยว-ค่าใช้จ่าย</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="utils.js" defer></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { extend: { fontFamily: { sans: ['Kanit', 'sans-serif'] } } }
+    }
+  </script>
+
+  <style>
+    * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    html { scroll-behavior: smooth; overflow-x: hidden; }
+    body { font-family: 'Kanit', sans-serif; background: #f8fafc; transition: background-color 0.4s ease; }
+    .dark body { background: #0f172a; }
+    .bg-slider { position: absolute; inset: 0; background-size: cover; background-position: center; background-attachment: fixed; transition: opacity 1.5s ease-in-out; opacity: 0; will-change: opacity; }
+    @media (max-width: 768px) { .bg-slider { background-attachment: scroll; } }
+    .bg-slider.active { opacity: 1; }
+    .hero-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.55); z-index: 1; }
+    .hero-content { position: relative; z-index: 2; }
+    
+    /* Profile Dropdown Menu */
+    .profile-dropdown {
+      position: absolute;
+      right: 0;
+      top: 100%;
+      margin-top: 0.5rem;
+      width: 280px;
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px) scale(0.95);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 50;
+    }
+
+    .dark .profile-dropdown {
+      background: #1e293b;
+    }
+
+    .profile-dropdown.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+    }
+
+    .profile-dropdown::before {
+      content: '';
+      position: absolute;
+      top: -8px;
+      right: 16px;
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-bottom: 8px solid white;
+    }
+
+    .dark .profile-dropdown::before {
+      border-bottom-color: #1e293b;
+    }
+
+    .profile-header {
+      padding: 1rem;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .dark .profile-header {
+      border-bottom-color: #374151;
+    }
+
+    .profile-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #6366f1;
+    }
+
+    .profile-info h3 {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #1f2937;
+    }
+
+    .dark .profile-info h3 {
+      color: #f1f5f9;
+    }
+
+    .profile-info p {
+      font-size: 0.75rem;
+      color: #6b7280;
+    }
+
+    .dark .profile-info p {
+      color: #9ca3af;
+    }
+
+    .profile-menu {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      padding: 0.75rem;
+    }
+
+    .profile-menu-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem 0.5rem;
+      cursor: pointer;
+      border-radius: 0.75rem;
+      transition: all 0.2s ease;
+      color: #6b7280;
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .dark .profile-menu-item {
+      color: #d1d5db;
+    }
+
+    .profile-menu-item:hover {
+      background: #f3f4f6;
+      color: #6366f1;
+    }
+
+    .dark .profile-menu-item:hover {
+      background: #374151;
+      color: #818cf8;
+    }
+
+    .profile-menu-item .icon {
+      font-size: 1.75rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .profile-divider {
+      height: 1px;
+      background: #e5e7eb;
+      margin: 0.5rem 0;
+    }
+
+    .dark .profile-divider {
+      background: #374151;
+    }
+
+    .profile-action {
+      padding: 0.75rem 1rem;
+      color: #6b7280;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 0.875rem;
+      width: 100%;
+      text-align: left;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-radius: 0.5rem;
+      margin: 0.25rem;
+    }
+
+    .dark .profile-action {
+      color: #d1d5db;
+    }
+
+    .profile-action:hover {
+      background: #f3f4f6;
+      color: #6366f1;
+    }
+
+    .dark .profile-action:hover {
+      background: #374151;
+      color: #818cf8;
+    }
+
+    .profile-action.logout {
+      color: #ef4444;
+    }
+
+    .profile-action.logout:hover {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .dark .profile-action.logout:hover {
+      background: #7f1d1d;
+      color: #fca5a5;
+    }
+
+    /* Modal */
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s ease; padding: 1rem; backdrop-filter: blur(4px); }
+    .modal.show { opacity: 1; visibility: visible; }
+    .modal-content { background: white; max-width: 90%; width: 520px; border-radius: 16px; padding: 2.5rem 2rem 2rem; position: relative; box-shadow: 0 15px 40px rgba(0,0,0,0.3); transform: scale(0.9); transition: transform 0.3s ease; max-height: 90vh; overflow-y: auto; }
+    .dark .modal-content { background: #1e293b; color: #e2e8f0; }
+    .modal.show .modal-content { transform: scale(1); }
+    .modal-icon-img { width: 80px; height: 80px; margin: 0 auto 1.5rem; display: block; border-radius: 50%; object-fit: contain; box-shadow: 0 8px 20px rgba(99,102,241,0.3); }
+    .close-btn { position: absolute; top: 1rem; right: 1.5rem; font-size: 2rem; cursor: pointer; color: #6b7280; transition: color 0.2s ease; }
+    .close-btn:hover { color: #1f2937; }
+    .dark .close-btn { color: #9ca3af; }
+    .dark .close-btn:hover { color: #f1f5f9; }
+
+    .ripple-btn { position: relative; overflow: hidden; display: inline-flex; align-items: center; justify-content: center; transition: all 0.3s ease; }
+    .ripple-btn::after { content: ''; position: absolute; width: 0; height: 0; background: rgba(255, 255, 255, 0.35); border-radius: 50%; transform: translate(-50%, -50%); opacity: 0; pointer-events: none; }
+    .ripple-btn:active::after { width: 200px; height: 200px; opacity: 1; transition: width 0.6s ease-out, height 0.6s ease-out, opacity 0.6s ease-out; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+          <img src="https://i.postimg.cc/d3Jnyv2F/11zon-cropped.png" alt="โลโก้เว็บ" class="w-10 h-10 rounded-full object-cover flex-shrink-0" loading="lazy">
+          <h1 class="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white truncate">จัดการเวลาเที่ยว-ค่าใช้จ่าย</h1>
+        </div>
+        <div class="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+          <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition" aria-label="สลับธีม">
+            <span id="theme-icon" class="material-symbols-outlined text-gray-600 dark:text-gray-300">dark_mode</span>
+          </button>
+          <div id="profileBtnContainer" class="relative"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="relative min-h-[60vh] sm:min-h-[70vh] flex items-center text-white overflow-hidden">
+    <div id="bg1" class="bg-slider active" style="background-image: url('https://img5.pic.in.th/file/secure-sv1/1000478230.png');"></div>
+    <div id="bg2" class="bg-slider" style="background-image: url('https://img2.pic.in.th/1000478232.png');"></div>
+    <div id="bg3" class="bg-slider" style="background-image: url('https://img2.pic.in.th/1000478233.png');"></div>
+    <div id="bg4" class="bg-slider" style="background-image: url('https://img2.pic.in.th/1000480947.jpg');"></div>
+    <div id="bg5" class="bg-slider" style="background-image: url('https://img5.pic.in.th/file/secure-sv1/1000480946.jpg');"></div>
+    <div id="bg6" class="bg-slider" style="background-image: url('https://img2.pic.in.th/1000480945.jpg');"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-12 sm:py-16 md:py-24">
+      <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight">จัดการการเดินทาง<br class="hidden sm:block">ได้อย่างง่ายดาย</h2>
+      <p class="text-base sm:text-lg md:text-xl mb-6 sm:mb-10 max-w-3xl mx-auto opacity-90">แอปพลิเคชันมือถือที่ช่วยวางแผนการเดินทาง ติดตามค่าใช้จ่าย ค้นหาสถานที่ และอื่น ๆ อีกมากมาย ในที่เดียว</p>
+      <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center flex-wrap">
+        <a href="su.html" class="ripple-btn px-6 sm:px-8 py-3 sm:py-4 bg-white text-indigo-700 hover:bg-gray-100 font-bold text-base sm:text-lg rounded-full shadow-xl transition transform hover:scale-105">สมัครสมาชิกฟรี</a>
+        <a href="#features" class="ripple-btn px-6 sm:px-8 py-3 sm:py-4 bg-white/20 border border-white text-white hover:bg-white/30 font-bold text-base sm:text-lg rounded-full transition transform hover:scale-105">เรียนรู้เพิ่มเติม</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="py-12 sm:py-16 md:py-20 bg-white dark:bg-gray-900 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h3 class="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 sm:mb-12 text-gray-900 dark:text-white">ฟีเจอร์ที่นำเสนอ</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+        <div class="group p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border border-indigo-200 dark:border-indigo-800 hover:shadow-lg transition-all">
+          <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-indigo-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"><span class="material-symbols-outlined text-white text-2xl">route</span></div>
+          <h4 class="text-xl sm:text-2xl font-bold mb-3 text-gray-900 dark:text-white">จัดการทริป</h4>
+          <p class="text-gray-700 dark:text-gray-300 text-sm sm:text-base">สร้างและจัดการแผนการเดินทางของคุณได้อย่างง่ายดาย พร้อมบันทึกข้อมูลครบถ้วน</p>
+        </div>
+        <div class="group p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/20 border border-pink-200 dark:border-pink-800 hover:shadow-lg transition-all">
+          <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-pink-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"><span class="material-symbols-outlined text-white text-2xl">map</span></div>
+          <h4 class="text-xl sm:text-2xl font-bold mb-3 text-gray-900 dark:text-white">แผนที่นำทาง</h4>
+          <p class="text-gray-700 dark:text-gray-300 text-sm sm:text-base">ดูแผนที่แบบเรียลไทม์ ค้นหาเส้นทาง และบันทึกสถานที่โปรด</p>
+        </div>
+        <div class="group p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-sky-50 to-blue-50 dark:from-sky-900/20 dark:to-blue-900/20 border border-sky-200 dark:border-sky-800 hover:shadow-lg transition-all">
+          <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-sky-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"><span class="material-symbols-outlined text-white text-2xl">cloud</span></div>
+          <h4 class="text-xl sm:text-2xl font-bold mb-3 text-gray-900 dark:text-white">พยากรณ์อากาศ</h4>
+          <p class="text-gray-700 dark:text-gray-300 text-sm sm:text-base">ตรวจสอบสภาพอากาศและ AQI ก่อนออกเดินทางทุกครั้ง</p>
+        </div>
+        <div class="group p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-200 dark:border-amber-800 hover:shadow-lg transition-all">
+          <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-amber-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"><span class="material-symbols-outlined text-white text-2xl">local_gas_station</span></div>
+          <h4 class="text-xl sm:text-2xl font-bold mb-3 text-gray-900 dark:text-white">ราคาน้ำมัน</h4>
+          <p class="text-gray-700 dark:text-gray-300 text-sm sm:text-base">เปรียบเทียบราคาน้ำมันล่าสุดจากทุกปั้มทั่วประเทศ</p>
+        </div>
+        <div class="group p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/20 border border-teal-200 dark:border-teal-800 hover:shadow-lg transition-all">
+          <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-teal-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"><span class="material-symbols-outlined text-white text-2xl">location_on</span></div>
+          <h4 class="text-xl sm:text-2xl font-bold mb-3 text-gray-900 dark:text-white">ค้นหาสถานที่</h4>
+          <p class="text-gray-700 dark:text-gray-300 text-sm sm:text-base">ค้นหาร้านอาหาร โรงแรม สถานที่เที่ยว พร้อมรีวิวและข้อมูลครบถ้วน</p>
+        </div>
+        <div class="group p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 border border-red-200 dark:border-red-800 hover:shadow-lg transition-all">
+          <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-red-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"><span class="material-symbols-outlined text-white text-2xl">payments</span></div>
+          <h4 class="text-xl sm:text-2xl font-bold mb-3 text-gray-900 dark:text-white">บันทึกค่าใช้จ่าย</h4>
+          <p class="text-gray-700 dark:text-gray-300 text-sm sm:text-base">บันทึกค่าใช้จ่ายระหว่างทริป แยกตามหมวดหมู่และสมาชิก</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Choose Us Section -->
+  <section class="py-12 sm:py-16 md:py-20 bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-900 dark:to-purple-900 text-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h3 class="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-12 sm:mb-16">ทำไมถึงเลือกเรา?</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 mb-12 sm:mb-16">
+        <div class="flex gap-4 sm:gap-6">
+          <div class="flex-shrink-0"><div class="flex items-center justify-center h-12 w-12 rounded-md bg-white/20"><span class="material-symbols-outlined">check_circle</span></div></div>
+          <div><h4 class="text-lg sm:text-xl font-bold mb-2">ใช้งานง่าย</h4><p class="opacity-90 text-sm sm:text-base">แอปพลิเคชันออกแบบมาให้ใช้งานง่าย และเข้าใจง่ายสำหรับทุกคน</p></div>
+        </div>
+        <div class="flex gap-4 sm:gap-6">
+          <div class="flex-shrink-0"><div class="flex items-center justify-center h-12 w-12 rounded-md bg-white/20"><span class="material-symbols-outlined">security</span></div></div>
+          <div><h4 class="text-lg sm:text-xl font-bold mb-2">ปลอดภัย</h4><p class="opacity-90 text-sm sm:text-base">ข้อมูลของคุณถูกเข้ารหัสและเก็บรักษาอย่างปลอดภัยที่สุด</p></div>
+        </div>
+        <div class="flex gap-4 sm:gap-6">
+          <div class="flex-shrink-0"><div class="flex items-center justify-center h-12 w-12 rounded-md bg-white/20"><span class="material-symbols-outlined">cloud_sync</span></div></div>
+          <div><h4 class="text-lg sm:text-xl font-bold mb-2">ซิงค์โดยอัตโนมัติ</h4><p class="opacity-90 text-sm sm:text-base">ข้อมูลของคุณจะซิงค์อัตโนมัติระหว่างอุปกรณ์ทั้งหมด</p></div>
+        </div>
+        <div class="flex gap-4 sm:gap-6">
+          <div class="flex-shrink-0"><div class="flex items-center justify-center h-12 w-12 rounded-md bg-white/20"><span class="material-symbols-outlined">support_agent</span></div></div>
+          <div><h4 class="text-lg sm:text-xl font-bold mb-2">สนับสนุนตลอดเวลา</h4><p class="opacity-90 text-sm sm:text-base">ทีมสนับสนุนของเรากำลังพร้อมช่วยคุณตลอด 24 ชั่วโมง</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-12 sm:py-16 md:py-20 bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-900 dark:to-purple-900 text-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6">พร้อมที่จะเริ่มต้นหรือยัง?</h2>
+      <p class="text-base sm:text-lg md:text-xl mb-8 sm:mb-10 opacity-90">สมัครสมาชิกวันนี้และเริ่มจัดการทริปและค่าใช้จ่ายได้ทันที</p>
+      <a href="su.html" class="ripple-btn px-8 sm:px-10 py-4 sm:py-5 bg-white text-indigo-700 hover:bg-gray-100 font-bold text-base sm:text-lg rounded-full shadow-2xl transition transform hover:scale-105 inline-block">สมัครสมาชิกฟรี</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-gray-400 py-12 text-center">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h3 class="text-xl sm:text-2xl font-bold text-white mb-4">จัดการเวลาเที่ยว-ค่าใช้จ่าย</h3>
+      <p class="mb-6 text-sm sm:text-base">วางแผนทริปให้สนุก ไม่ต้องกังวลเรื่องเวลาและเงินอีกต่อไป</p>
+      <div class="flex justify-center gap-4 sm:gap-8 mb-8 flex-wrap">
+        <button onclick="openModal('about')" class="hover:text-white transition text-sm sm:text-base">เกี่ยวกับเรา</button>
+        <button onclick="openModal('privacy')" class="hover:text-white transition text-sm sm:text-base">ความเป็นส่วนตัว</button>
+        <button onclick="openModal('terms')" class="hover:text-white transition text-sm sm:text-base">ข้อกำหนด</button>
+        <button onclick="openModal('contact')" class="hover:text-white transition text-sm sm:text-base">ติดต่อเรา</button>
+      </div>
+      <p class="text-xs sm:text-sm">© 2569 จัดการเวลาเที่ยว-ค่าใช้จ่าย. สงวนลิขสิทธิ์</p>
+    </div>
+  </footer>
+
+  <!-- Modal -->
+  <div id="modal" class="modal" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <span class="close-btn" onclick="closeModal()">×</span>
+      <img id="modal-icon" class="modal-icon-img" src="" alt="ไอคอน" loading="lazy" />
+      <div id="modal-title" class="text-xl sm:text-2xl font-bold mb-4 text-center text-gray-900 dark:text-white"></div>
+      <div id="modal-body" class="text-gray-700 dark:text-gray-300 space-y-4 text-center text-sm sm:text-base"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAUMhtE1uw9vj7yzMKIZ_w769CrUDwEoww",
+      authDomain: "paiteaw-web.firebaseapp.com",
+      projectId: "paiteaw-web",
+      storageBucket: "paiteaw-web.firebasestorage.app",
+      messagingSenderId: "176353291629",
+      appId: "1:176353291629:web:de680e1dcc07b8a1c6be64",
+      measurementId: "G-ZP0W1EPL62"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Dark Mode
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    function setTheme(isDark) {
+      document.documentElement.classList.toggle('dark', isDark);
+      themeIcon.textContent = isDark ? 'light_mode' : 'dark_mode';
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    }
+    if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      setTheme(true);
+    } else {
+      setTheme(false);
+    }
+    themeToggle.addEventListener('click', () => setTheme(!document.documentElement.classList.contains('dark')));
+
+    // Background Slider
+    const backgrounds = document.querySelectorAll('.bg-slider');
+    let currentIndex = 0;
+    function showNextBackground() {
+      backgrounds[currentIndex].classList.remove('active');
+      currentIndex = (currentIndex + 1) % backgrounds.length;
+      backgrounds[currentIndex].classList.add('active');
+    }
+    setInterval(showNextBackground, 5000);
+
+    // Modal Functions
+    window.openModal = function(type) {
+      let iconSrc = '', title = '', content = '';
+      if (type === 'about') {
+        iconSrc = 'https://i.postimg.cc/j2yvW2wz/ei-1770987837910-removebg-preview.png';
+        title = 'เกี่ยวกับเรา';
+        content = `<p class="text-base">แอปพลิเคชัน "จัดการเวลาเที่ยว-ค่าใช้จ่าย" พัฒนาขึ้นเพื่อช่วยให้การวางแผนทริปและการเดินทางของคุณง่ายดายและสนุกยิ่งขึ้น</p>`;
+      } else if (type === 'privacy') {
+        iconSrc = 'https://i.postimg.cc/T1nQy1Lm/technology-safety-internet-privacy-protection-secure-security-icon-231797.png';
+        title = 'ความเป็นส่วนตัว';
+        content = `<p>เราให้ความสำคัญกับความเป็นส่วนตัวของผู้ใช้เป็นอย่างยิ่ง</p>`;
+      } else if (type === 'terms') {
+        iconSrc = 'https://i.postimg.cc/br1LGrD9/ei-1770987817459-removebg-preview.png';
+        title = 'ข้อกำหนดการใช้งาน';
+        content = `<p>การใช้งานแอปพลิเคชันนี้อยู่ภายใต้เงื่อนไขต่างๆ</p>`;
+      } else if (type === 'contact') {
+        iconSrc = 'https://i.postimg.cc/5y8pHyYQ/crop-1628493984058.png';
+        title = 'ติดต่อเรา';
+        content = `<p class="text-base font-medium">ชื่อผู้พัฒนา: <strong>SoDa</strong></p><p class="mt-4">อีเมล: <a href="mailto:soda.zen2426@gmail.com" class="text-indigo-400 hover:underline">soda.zen2426@gmail.com</a></p>`;
+      }
+      document.getElementById('modal-icon').src = iconSrc;
+      document.getElementById('modal-title').textContent = title;
+      document.getElementById('modal-body').innerHTML = content;
+      document.getElementById('modal').classList.add('show');
+      document.body.style.overflow = 'hidden';
+    };
+
+    window.closeModal = function(e) {
+      if (!e || e.target === document.getElementById('modal') || e.target.classList.contains('close-btn')) {
+        document.getElementById('modal').classList.remove('show');
+        document.body.style.overflow = '';
+      }
+    };
+
+    // Auth State
+    onAuthStateChanged(auth, async (user) => {
+      const profileBtnContainer = document.getElementById('profileBtnContainer');
+      if (user) {
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        const userData = userDoc.exists() ? userDoc.data() : {};
+        const photoURL = userData.photoURL || user.photoURL || 'https://i.postimg.cc/d3Jnyv2F/11zon-cropped.png';
+        const displayName = userData.username || user.displayName || user.email.split('@')[0];
+
+        profileBtnContainer.innerHTML = `
+          <div class="relative">
+            <button id="profileBtn" class="flex items-center gap-2 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full font-medium transition">
+              <img src="${photoURL}" alt="${displayName}" class="w-8 h-8 rounded-full object-cover border border-white">
+              <span class="hidden sm:inline text-sm truncate max-w-[100px]">${displayName}</span>
+              <span class="material-symbols-outlined text-sm">expand_more</span>
+            </button>
+            <div id="profileDropdown" class="profile-dropdown">
+              <div class="profile-header">
+                <img src="${photoURL}" alt="${displayName}" class="profile-avatar">
+                <div class="profile-info">
+                  <h3>${displayName}</h3>
+                  <p>${user.email}</p>
+                </div>
+              </div>
+              <div class="profile-menu">
+                <a href="dashboard.html" class="profile-menu-item" title="แดชบอร์ด"><span class="icon material-symbols-outlined">dashboard</span>แดชบอร์ด</a>
+                <a href="map.html" class="profile-menu-item" title="แผนที่"><span class="icon material-symbols-outlined">map</span>แผนที่</a>
+                <a href="places.html" class="profile-menu-item" title="สถานที่"><span class="icon material-symbols-outlined">location_on</span>สถานที่</a>
+                <a href="wt.html" class="profile-menu-item" title="อากาศ"><span class="icon material-symbols-outlined">cloud</span>อากาศ</a>
+                <a href="oil.html" class="profile-menu-item" title="น้ำมัน"><span class="icon material-symbols-outlined">local_gas_station</span>น้ำมัน</a>
+                <a href="dashboard.html" class="profile-menu-item" title="โปรไฟล์"><span class="icon material-symbols-outlined">person</span>โปรไฟล์</a>
+                <a href="dashboard.html" class="profile-menu-item" title="ตั้งค่า"><span class="icon material-symbols-outlined">settings</span>ตั้งค่า</a>
+                <button onclick="handleLogout()" class="profile-menu-item" title="ออก"><span class="icon material-symbols-outlined" style="color:#ef4444;">logout</span><span style="color:#ef4444;">ออก</span></button>
+              </div>
+              <div class="profile-divider"></div>
+              <button onclick="handleLogout()" class="profile-action logout"><span class="material-symbols-outlined text-sm">logout</span>ออกจากระบบ</button>
+            </div>
+          </div>
+        `;
+
+        document.getElementById('profileBtn').addEventListener('click', (e) => {
+          e.stopPropagation();
+          document.getElementById('profileDropdown').classList.toggle('show');
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!e.target.closest('#profileBtnContainer')) {
+            document.getElementById('profileDropdown')?.classList.remove('show');
+          }
+        });
+
+        window.notificationManager?.success?.(`ยินดีต้อนรับ ${displayName}!`, 3000);
+      } else {
+        profileBtnContainer.innerHTML = `<a href="login.html" class="ripple-btn px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full font-medium transition text-sm sm:text-base">เข้าสู่ระบบ</a>`;
+      }
+    });
+
+    window.handleLogout = async () => {
+      try {
+        await signOut(auth);
+        window.notificationManager?.success?.('ออกจากระบบสำเร็จ', 2000);
+        setTimeout(() => window.location.reload(), 1000);
+      } catch (error) {
+        window.notificationManager?.error?.('ออกจากระบบล้มเหลว', 4000);
+      }
+    };
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') document.getElementById('modal').classList.remove('show');
+    });
+  </script>
+</body>
+</html>

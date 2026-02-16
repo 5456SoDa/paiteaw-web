@@ -1,0 +1,487 @@
+{
+  "oilPrices": {
+    "PTT": {
+      "gasohol95": {
+        "name": "แกะ 95",
+        "price": "33.45",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "stable",
+        "change": "0.00"
+      },
+      "gasohol91": {
+        "name": "แกะ 91",
+        "price": "32.15",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "stable",
+        "change": "0.00"
+      },
+      "gasoholE20": {
+        "name": "แกะ E20",
+        "price": "31.85",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "stable",
+        "change": "0.00"
+      },
+      "gasoholE85": {
+        "name": "แกะ E85",
+        "price": "28.50",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "up",
+        "change": "+0.50"
+      },
+      "diesel": {
+        "name": "ดีเซล",
+        "price": "30.65",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "down",
+        "change": "-0.10"
+      },
+      "dieselB7": {
+        "name": "ดีเซล B7",
+        "price": "30.75",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "down",
+        "change": "-0.10"
+      },
+      "dieselB20": {
+        "name": "ดีเซล B20",
+        "price": "29.95",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "down",
+        "change": "-0.10"
+      },
+      "premiumDiesel": {
+        "name": "ดีเซลพรีเมี่ยม",
+        "price": "34.20",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "stable",
+        "change": "0.00"
+      },
+      "premiumGasohol95": {
+        "name": "แกะพรีเมี่ยม 95",
+        "price": "36.80",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "up",
+        "change": "+0.30"
+      },
+      "ngv": {
+        "name": "ก๊าซธรรมชาติ",
+        "price": "16.45",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "stable",
+        "change": "0.00"
+      }
+    },
+    "BANGCHAK": {
+      "gasohol95": {
+        "name": "แกะ 95",
+        "price": "33.55",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "stable",
+        "change": "0.00"
+      },
+      "gasohol91": {
+        "name": "แกะ 91",
+        "price": "32.25",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "stable",
+        "change": "0.00"
+      },
+      "gasoholE20": {
+        "name": "แกะ E20",
+        "price": "31.95",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "stable",
+        "change": "0.00"
+      },
+      "gasoholE85": {
+        "name": "แกะ E85",
+        "price": "28.60",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "up",
+        "change": "+0.50"
+      },
+      "diesel": {
+        "name": "ดีเซล",
+        "price": "30.75",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "down",
+        "change": "-0.10"
+      },
+      "dieselB7": {
+        "name": "ดีเซล B7",
+        "price": "30.85",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "down",
+        "change": "-0.10"
+      },
+      "dieselB20": {
+        "name": "ดีเซล B20",
+        "price": "30.05",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "down",
+        "change": "-0.10"
+      },
+      "premiumDiesel": {
+        "name": "ดีเซลพรีเมี่ยม",
+        "price": "34.30",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "stable",
+        "change": "0.00"
+      },
+      "premiumGasohol95": {
+        "name": "แกะพรีเมี่ยม 95",
+        "price": "36.90",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "up",
+        "change": "+0.30"
+      },
+      "ngv": {
+        "name": "ก๊าซธรรมชาติ",
+        "price": "16.55",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "stable",
+        "change": "0.00"
+      }
+    },
+    "SHELL": {
+      "gasohol95": {
+        "name": "แกะ 95",
+        "price": "33.65",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "stable",
+        "change": "0.00"
+      },
+      "gasohol91": {
+        "name": "แกะ 91",
+        "price": "32.35",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "stable",
+        "change": "0.00"
+      },
+      "gasoholE20": {
+        "name": "แกะ E20",
+        "price": "32.05",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "stable",
+        "change": "0.00"
+      },
+      "gasoholE85": {
+        "name": "แกะ E85",
+        "price": "28.70",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "up",
+        "change": "+0.50"
+      },
+      "diesel": {
+        "name": "ดีเซล",
+        "price": "30.85",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "down",
+        "change": "-0.10"
+      },
+      "dieselB7": {
+        "name": "ดีเซล B7",
+        "price": "30.95",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "down",
+        "change": "-0.10"
+      },
+      "dieselB20": {
+        "name": "ดีเซล B20",
+        "price": "30.15",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "down",
+        "change": "-0.10"
+      },
+      "premiumDiesel": {
+        "name": "ดีเซลพรีเมี่ยม",
+        "price": "34.40",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "stable",
+        "change": "0.00"
+      },
+      "premiumGasohol95": {
+        "name": "แกะพรีเมี่ยม 95",
+        "price": "37.00",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "up",
+        "change": "+0.30"
+      },
+      "ngv": {
+        "name": "ก๊าซธรรมชาติ",
+        "price": "16.65",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "stable",
+        "change": "0.00"
+      }
+    },
+    "CALTEX": {
+      "gasohol95": {
+        "name": "แกะ 95",
+        "price": "33.75",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "stable",
+        "change": "0.00"
+      },
+      "gasohol91": {
+        "name": "แกะ 91",
+        "price": "32.45",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "stable",
+        "change": "0.00"
+      },
+      "gasoholE20": {
+        "name": "แกะ E20",
+        "price": "32.15",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "stable",
+        "change": "0.00"
+      },
+      "gasoholE85": {
+        "name": "แกะ E85",
+        "price": "28.80",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "up",
+        "change": "+0.50"
+      },
+      "diesel": {
+        "name": "ดีเซล",
+        "price": "30.95",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "down",
+        "change": "-0.10"
+      },
+      "dieselB7": {
+        "name": "ดีเซล B7",
+        "price": "31.05",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "down",
+        "change": "-0.10"
+      },
+      "dieselB20": {
+        "name": "ดีเซล B20",
+        "price": "30.25",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "down",
+        "change": "-0.10"
+      },
+      "premiumDiesel": {
+        "name": "ดีเซลพรีเมี่ยม",
+        "price": "34.50",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "stable",
+        "change": "0.00"
+      },
+      "premiumGasohol95": {
+        "name": "แกะพรีเมี่ยม 95",
+        "price": "37.10",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "up",
+        "change": "+0.30"
+      },
+      "ngv": {
+        "name": "ก๊าซธรรมชาติ",
+        "price": "16.75",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "stable",
+        "change": "0.00"
+      }
+    },
+    "ESSO": {
+      "gasohol95": {
+        "name": "แกะ 95",
+        "price": "33.35",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "stable",
+        "change": "0.00"
+      },
+      "gasohol91": {
+        "name": "แกะ 91",
+        "price": "32.05",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "stable",
+        "change": "0.00"
+      },
+      "gasoholE20": {
+        "name": "แกะ E20",
+        "price": "31.75",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "stable",
+        "change": "0.00"
+      },
+      "gasoholE85": {
+        "name": "แกะ E85",
+        "price": "28.40",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "up",
+        "change": "+0.50"
+      },
+      "diesel": {
+        "name": "ดีเซล",
+        "price": "30.55",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "down",
+        "change": "-0.10"
+      },
+      "dieselB7": {
+        "name": "ดีเซล B7",
+        "price": "30.65",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "down",
+        "change": "-0.10"
+      },
+      "dieselB20": {
+        "name": "ดีเซล B20",
+        "price": "29.85",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "down",
+        "change": "-0.10"
+      },
+      "premiumDiesel": {
+        "name": "ดีเซลพรีเมี่ยม",
+        "price": "34.10",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "stable",
+        "change": "0.00"
+      },
+      "premiumGasohol95": {
+        "name": "แกะพรีเมี่ยม 95",
+        "price": "36.70",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "up",
+        "change": "+0.30"
+      },
+      "ngv": {
+        "name": "ก๊าซธรรมชาติ",
+        "price": "16.35",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "stable",
+        "change": "0.00"
+      }
+    },
+    "MOBIL": {
+      "gasohol95": {
+        "name": "แกะ 95",
+        "price": "33.85",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "stable",
+        "change": "0.00"
+      },
+      "gasohol91": {
+        "name": "แกะ 91",
+        "price": "32.55",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "stable",
+        "change": "0.00"
+      },
+      "gasoholE20": {
+        "name": "แกะ E20",
+        "price": "32.25",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "stable",
+        "change": "0.00"
+      },
+      "gasoholE85": {
+        "name": "แกะ E85",
+        "price": "28.90",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "up",
+        "change": "+0.50"
+      },
+      "diesel": {
+        "name": "ดีเซล",
+        "price": "31.05",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "down",
+        "change": "-0.10"
+      },
+      "dieselB7": {
+        "name": "ดีเซล B7",
+        "price": "31.15",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "down",
+        "change": "-0.10"
+      },
+      "dieselB20": {
+        "name": "ดีเซล B20",
+        "price": "30.35",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "down",
+        "change": "-0.10"
+      },
+      "premiumDiesel": {
+        "name": "ดีเซลพรีเมี่ยม",
+        "price": "34.60",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "stable",
+        "change": "0.00"
+      },
+      "premiumGasohol95": {
+        "name": "แกะพรีเมี่ยม 95",
+        "price": "37.20",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "up",
+        "change": "+0.30"
+      },
+      "ngv": {
+        "name": "ก๊าซธรรมชาติ",
+        "price": "16.85",
+        "lastUpdated": "2024-01-15T10:30:00Z",
+        "trend": "stable",
+        "change": "0.00"
+      }
+    }
+  },
+  "stations": {
+    "PTT": {
+      "name": "สถานีปตท (PTT)",
+      "code": "PTT",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/PTT_logo.png",
+      "color": "#ff6b35",
+      "description": "บริษัท ปตท. จำกัด (มหาชน)"
+    },
+    "BANGCHAK": {
+      "name": "สถานีบางจาก (BCP)",
+      "code": "BCP",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Bangchak_logo.png",
+      "color": "#1e90ff",
+      "description": "บริษัท บางจาก จำกัด (มหาชน)"
+    },
+    "SHELL": {
+      "name": "สถานีเชลล์ (Shell)",
+      "code": "SHELL",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Shell_logo.svg",
+      "color": "#ffcc00",
+      "description": "Shell Thailand Limited"
+    },
+    "CALTEX": {
+      "name": "สถานีแคลเท็กซ์ (Caltex)",
+      "code": "CALTEX",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Chevron_Caltex.png",
+      "color": "#00a3e0",
+      "description": "Chevron Thailand Limited"
+    },
+    "ESSO": {
+      "name": "สถานีเอสโซ่ (Esso)",
+      "code": "ESSO",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Exxonmobil_Logo.svg",
+      "color": "#e62e04",
+      "description": "Esso (Thailand) Limited"
+    },
+    "MOBIL": {
+      "name": "สถานีโมบิล (Mobil)",
+      "code": "MOBIL",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Mobil_logo.svg",
+      "color": "#e2001a",
+      "description": "Mobil Oil Thailand Limited"
+    }
+  },
+  "metadata": {
+    "lastUpdate": "2024-01-15T10:30:00Z",
+    "currency": "THB",
+    "unit": "บาท/ลิตร",
+    "timezone": "Asia/Bangkok",
+    "version": "1.0.0"
+  }
+}
